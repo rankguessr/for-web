@@ -12,12 +12,14 @@
 		TableBodyCell,
 		TableBodyRow,
 		TableHead,
-		TableHeadCell
+		TableHeadCell,
+		Spinner
 	} from 'flowbite-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 
 	const getUser = getContext<() => User | null>('user');
 	const user = $derived(getUser());
+
 	let latest = client.getLatest();
 
 	async function createRoom() {
@@ -31,7 +33,7 @@
 	}
 </script>
 
-<section class="flex w-full flex-1 justify-center gap-6 p-6">
+<section class="flex w-full flex-1 justify-center gap-6 py-8">
 	<Card class="flex max-w-xl flex-1 items-center justify-center gap-5 p-5">
 		<div class="w-full space-y-2">
 			<div class="flex items-center gap-2">
@@ -46,7 +48,7 @@
 
 		<div class="flex w-full flex-wrap items-center gap-3">
 			{#if user}
-				<Button color="primary" size="lg" onclick={createRoom}>
+				<Button color="primary" class="cursor-pointer" size="lg" onclick={createRoom}>
 					<Gamepad2 class="mr-2 h-4 w-4" />
 					Start new game
 				</Button>
@@ -78,11 +80,13 @@
 					<Clock4 class="h-4 w-4" />
 					<h2 class="text-xl font-semibold">Last guesses</h2>
 				</div>
-				<Badge color="gray">Recent 5</Badge>
+				<Badge color="gray">Recent 10</Badge>
 			</div>
 
 			{#await latest}
-				<div>Loading...</div>
+				<div class="flex items-center justify-center">
+					<Spinner type="default" color="primary" />
+				</div>
 			{:then guesses}
 				{#if guesses.length > 0}
 					<Table hoverable>
@@ -92,12 +96,12 @@
 							<TableHeadCell>Elo</TableHeadCell>
 						</TableHead>
 						<TableBody class="divide-y">
-							{#each guesses as guess}
+							{#each guesses.splice(0, 10) as guess}
 								<TableBodyRow>
 									<TableBodyCell>#{guess.guess}</TableBodyCell>
 									<TableBodyCell>#{guess.actual_rank}</TableBodyCell>
 									<TableBodyCell>
-										<Badge color={guess.elo > 0 ? 'green' : 'yellow'}>
+										<Badge color={guess.elo > 0 ? 'green' : 'red'}>
 											{guess.elo}
 										</Badge>
 									</TableBodyCell>

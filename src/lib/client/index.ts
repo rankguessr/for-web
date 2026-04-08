@@ -57,6 +57,13 @@ export type Score = {
 	beatmapset: BeatmapSet;
 };
 
+export type PublicStats = {
+	count_24h: number;
+	count_global: number;
+	best: Guess[];
+	latest: Guess[];
+};
+
 export type Guess = {
 	id: string;
 	elo: number;
@@ -78,6 +85,12 @@ export const client = {
 		} catch (err) {
 			throw new ClientError('An unexpected error occurred while making the API request: ' + err);
 		}
+	},
+
+	getPublicStats(): Promise<PublicStats> {
+		return this._makeRequest('/stats', {
+			credentials: 'include'
+		});
 	},
 
 	createRoom(): Promise<{ session_id: string }> {
@@ -112,17 +125,6 @@ export const client = {
 
 	getLatest(): Promise<Guess[]> {
 		return this._makeRequest('/user/latest', {
-			credentials: 'include'
-		});
-	},
-
-	getPublicStats(): Promise<{
-		best: Guess[];
-		latest: Guess[];
-		count_24h: number;
-		count_global: number;
-	}> {
-		return this._makeRequest('/stats/public', {
 			credentials: 'include'
 		});
 	}

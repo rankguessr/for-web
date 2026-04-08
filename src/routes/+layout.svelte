@@ -16,8 +16,8 @@
 </script>
 
 <ThemeProvider>
-	<main class="flex min-h-screen flex-col dark bg-gray-900 text-white">
-		<div class="mx-auto flex min-h-screen w-full max-w-7xl flex-col">
+	<main class="flex min-h-screen w-full flex-col dark bg-gray-900 text-white">
+		<div class="mx-auto flex min-h-screen w-full flex-col">
 			<Navbar user={data.user} />
 			<div class="flex w-full flex-1 flex-col">
 				{@render children()}

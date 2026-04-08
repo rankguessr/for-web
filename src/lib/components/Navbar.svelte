@@ -7,14 +7,15 @@
 </script>
 
 <Navbar class="px-3 py-1 sm:px-4 dark:border-gray-700">
-	<NavBrand href="/">
-		<span class="self-center text-xl font-semibold whitespace-nowrap">rankguessr</span>
-	</NavBrand>
+	<div class="flex gap-4">
+		<NavBrand href="/">
+			<span class="self-center text-xl font-semibold whitespace-nowrap">rankguessr</span>
+		</NavBrand>
 
-	<NavUl>
-		<NavLi href="/">Home</NavLi>
-		<NavLi href="/stats">Statistics</NavLi>
-	</NavUl>
+		<NavUl>
+			<NavLi href="/stats">statistics</NavLi>
+		</NavUl>
+	</div>
 
 	<div class="flex items-center gap-3 md:order-2">
 		{#if user}

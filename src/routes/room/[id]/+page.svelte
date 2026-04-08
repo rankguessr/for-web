@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 	import { client, type Guess, type User } from '$lib/client';
-	import { Badge, Button, Card } from 'flowbite-svelte';
+	import { Badge, Button, Card, Spinner } from 'flowbite-svelte';
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
@@ -40,11 +40,9 @@
 	}
 </script>
 
-<section class="flex w-full flex-1 flex-col items-center gap-6 p-6">
+<section class="flex w-full flex-1 flex-col items-center justify-center gap-6 py-8">
 	{#await room}
-		<Card>
-			<p class="text-gray-400">Loading session...</p>
-		</Card>
+		<Spinner type="default" color="primary" />
 	{:then room}
 		{@const score = room.score}
 		{@const stats = score.statistics}

@@ -6,6 +6,7 @@
 	import { goto } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import PlayButton from '$lib/components/PlayButton.svelte';
 
 	let { params }: PageProps = $props();
 
@@ -46,6 +47,8 @@
 		</Card>
 	{:then room}
 		{@const score = room.score}
+		{@const stats = score.statistics}
+
 		<div class="flex min-w-3xl flex-col items-center gap-5">
 			<div class="flex w-full flex-col gap-1">
 				<div class="flex items-center gap-2">
@@ -65,7 +68,17 @@
 					background-position: center;
 				`}
 			>
-				<h3 class="mb-2 text-lg font-semibold">Replay metadata</h3>
+				<div class="flex justify-between">
+					<div class="mb-2 flex items-center gap-1">
+						<PlayButton url={score.beatmapset.preview_url} shouldPlay={false} />
+						<h3 class="text-lg font-semibold">Score metadata</h3>
+					</div>
+					<p>
+						<span class="font-bold text-green-500">{stats.count_100}</span> /
+						<span class="font-bold text-yellow-500">{stats.count_50}</span> /
+						<span class="font-bold text-red-500">{stats.count_miss}</span>
+					</p>
+				</div>
 				<p class="text-gray-400">
 					{score.beatmapset?.artist} - {score.beatmapset?.title}
 				</p>
@@ -78,9 +91,13 @@
 						{/if}
 					</div>
 					<div class="flex gap-0.5">
-						{#each score.mods as mod}
-							<Badge color="yellow">{mod}</Badge>
-						{/each}
+						{#if score.mods.length > 0}
+							{#each score.mods as mod}
+								<Badge color="yellow">{mod}</Badge>
+							{/each}
+						{:else}
+							<Badge color="gray">NM</Badge>
+						{/if}
 					</div>
 				</div>
 			</div>
@@ -93,11 +110,7 @@
 						rank.
 					</p>
 
-					<Button
-						href={`${PUBLIC_API_URL}/room/${params.id}/replay`}
-						download={`rankguessr_${params.id}.osr`}
-						color="primary"
-					>
+					<Button href={`${PUBLIC_API_URL}/room/replay/${params.id}.osr`} color="primary">
 						Download .osr replay
 					</Button>
 				</Card>

@@ -46,6 +46,14 @@ export type Score = {
 	mods: string[];
 	accuracy: number;
 	beatmap: Beatmap;
+	statistics: {
+		count_300: number;
+		count_100: number;
+		count_50: number;
+		count_miss: number;
+		count_geki: number;
+		count_katu: number;
+	};
 	beatmapset: BeatmapSet;
 };
 

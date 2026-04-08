@@ -1,0 +1,28 @@
+<script lang="ts">
+	import type { User } from '$lib/client';
+	import { Avatar, Button, Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
+
+	let { user }: { user: User | null } = $props();
+</script>
+
+<Navbar class="px-3 py-1 sm:px-4 dark:border-gray-700">
+	<NavBrand href="/">
+		<span class="self-center text-xl font-semibold whitespace-nowrap">rankguessr</span>
+	</NavBrand>
+
+	<NavUl>
+		<NavLi href="/">Home</NavLi>
+		<NavLi href="/stats">Statistics</NavLi>
+	</NavUl>
+
+	<div class="flex items-center gap-3 md:order-2">
+		{#if user}
+			<div class="hidden text-right sm:block">
+				<p class="text-xs font-medium sm:text-sm">{user.username}</p>
+			</div>
+			<Avatar src={user.avatar_url} alt={user.username} class="h-8 w-8" />
+		{:else}
+			<Button href="/api/auth/login" size="sm" color="primary">Login with osu!</Button>
+		{/if}
+	</div>
+</Navbar>

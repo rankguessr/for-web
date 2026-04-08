@@ -5,6 +5,7 @@
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	let { params }: PageProps = $props();
 
@@ -93,7 +94,7 @@
 					</p>
 
 					<Button
-						href={`/api/room/${params.id}/replay`}
+						href={`${PUBLIC_API_URL}/room/${params.id}/replay`}
 						download={`rankguessr_${params.id}.osr`}
 						color="primary"
 					>

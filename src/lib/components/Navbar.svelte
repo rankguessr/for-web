@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PUBLIC_API_URL } from '$env/static/public';
 	import type { User } from '$lib/client';
 	import { Avatar, Button, Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
 
@@ -22,7 +23,9 @@
 			</div>
 			<Avatar src={user.avatar_url} alt={user.username} class="h-8 w-8" />
 		{:else}
-			<Button href="/api/auth/login" size="sm" color="primary">Login with osu!</Button>
+			<Button href={`${PUBLIC_API_URL}/auth/login`} size="sm" color="primary"
+				>Login with osu!</Button
+			>
 		{/if}
 	</div>
 </Navbar>

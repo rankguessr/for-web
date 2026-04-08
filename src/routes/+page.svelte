@@ -14,6 +14,7 @@
 		TableHead,
 		TableHeadCell
 	} from 'flowbite-svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	const getUser = getContext<() => User | null>('user');
 	const user = $derived(getUser());
@@ -54,7 +55,7 @@
 					Statistics
 				</Button>
 			{:else}
-				<Button color="primary" size="lg" href="/api/auth/login">
+				<Button color="primary" size="lg" href={`${PUBLIC_API_URL}/auth/login`}>
 					<span
 						class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-pink-600 text-xs font-bold text-white"
 					>

@@ -5,6 +5,12 @@
 	import { Spinner, ThemeProvider } from 'flowbite-svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+	import { injectAnalytics } from '@vercel/analytics/sveltekit';
+	import { dev } from '$app/environment';
+
+	injectSpeedInsights();
+	injectAnalytics({ mode: dev ? 'development' : 'production' });
 
 	let { children, data }: LayoutProps = $props();
 

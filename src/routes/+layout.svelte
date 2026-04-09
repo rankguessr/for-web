@@ -2,10 +2,21 @@
 	import { setContext } from 'svelte';
 	import type { LayoutProps } from './$types';
 	import './layout.css';
-	import { ThemeProvider } from 'flowbite-svelte';
+	import { Spinner, ThemeProvider } from 'flowbite-svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
 
 	let { children, data }: LayoutProps = $props();
+
+	let loading = $state(false);
+
+	beforeNavigate(() => {
+		loading = true;
+	});
+
+	afterNavigate(() => {
+		loading = false;
+	});
 
 	setContext('user', () => data.user);
 </script>
@@ -15,7 +26,13 @@
 		<div class="mx-auto flex min-h-screen w-full flex-col">
 			<Navbar user={data.user} />
 			<div class="flex w-full flex-1 flex-col">
-				{@render children()}
+				{#if loading}
+					<div class="flex flex-1 items-center justify-center">
+						<Spinner type="default" color="primary" />
+					</div>
+				{:else}
+					{@render children()}
+				{/if}
 			</div>
 			<!-- 
 			<Footer>

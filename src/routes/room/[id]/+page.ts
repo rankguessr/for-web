@@ -1,9 +1,9 @@
 import { client } from '$lib/client';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ params }) => {
+export const load: PageLoad = async ({ params, fetch }) => {
 	try {
-		let room = await client.getRoom(params.id);
+		let room = await client.getRoom(params.id, fetch);
 
 		return {
 			room,

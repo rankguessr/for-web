@@ -77,10 +77,12 @@ export type Guess = {
 	created_at: string;
 };
 
+export type Fetch = typeof fetch;
+
 export const client = {
-	async _makeRequest<T>(path: string, options?: RequestInit): Promise<T> {
+	async _makeRequest<T>(path: string, options?: RequestInit, customFetch?: Fetch): Promise<T> {
 		try {
-			const resp = await fetch(`${PUBLIC_API_URL}${path}`, options);
+			const resp = await (customFetch || fetch)(`${PUBLIC_API_URL}${path}`, options);
 			if (!resp.ok) {
 				const data = await resp.json();
 				throw new ServerError(data.message, resp.status);
@@ -92,39 +94,59 @@ export const client = {
 		}
 	},
 
-	getPublicStats(): Promise<PublicStats> {
-		return this._makeRequest('/stats', {
-			credentials: 'include'
-		});
+	getPublicStats(customFetch?: Fetch): Promise<PublicStats> {
+		return this._makeRequest(
+			'/stats',
+			{
+				credentials: 'include'
+			},
+			customFetch
+		);
 	},
 
-	getRoomNextScore(roomId: string): Promise<RoomInfo> {
-		return this._makeRequest(`/room/${roomId}/next`, {
-			method: 'POST',
-			credentials: 'include'
-		});
+	getRoomNextScore(roomId: string, customFetch?: Fetch): Promise<RoomInfo> {
+		return this._makeRequest(
+			`/room/${roomId}/next`,
+			{
+				method: 'POST',
+				credentials: 'include'
+			},
+			customFetch
+		);
 	},
 
-	getCurrentRoom(): Promise<{ room: Room | null }> {
-		return this._makeRequest('/user/current-room', {
-			credentials: 'include'
-		});
+	getCurrentRoom(customFetch?: Fetch): Promise<{ room: Room | null }> {
+		return this._makeRequest(
+			'/user/current-room',
+			{
+				credentials: 'include'
+			},
+			customFetch
+		);
 	},
 
-	createRoom(): Promise<{ room_id: string }> {
-		return this._makeRequest('/room/start', {
-			method: 'POST',
-			credentials: 'include'
-		});
+	createRoom(customFetch?: Fetch): Promise<{ room_id: string }> {
+		return this._makeRequest(
+			'/room/start',
+			{
+				method: 'POST',
+				credentials: 'include'
+			},
+			customFetch
+		);
 	},
 
-	getRoom(roomId: string): Promise<RoomInfo> {
-		return this._makeRequest(`/room/${roomId}/score`, {
-			credentials: 'include'
-		});
+	getRoom(roomId: string, customFetch?: Fetch): Promise<RoomInfo> {
+		return this._makeRequest(
+			`/room/${roomId}/score`,
+			{
+				credentials: 'include'
+			},
+			customFetch
+		);
 	},
 
-	submitGuess(roomId: string, guess: number): Promise<Guess> {
+	submitGuess(roomId: string, guess: number, customFetch?: Fetch): Promise<Guess> {
 		return this._makeRequest(`/room/${roomId}`, {
 			method: 'POST',
 			headers: {
@@ -135,15 +157,23 @@ export const client = {
 		});
 	},
 
-	getMe(): Promise<User> {
-		return this._makeRequest('/user/me', {
-			credentials: 'include'
-		});
+	getMe(customFetch?: Fetch): Promise<User> {
+		return this._makeRequest(
+			'/user/me',
+			{
+				credentials: 'include'
+			},
+			customFetch
+		);
 	},
 
-	getLatest(): Promise<Guess[]> {
-		return this._makeRequest('/user/latest', {
-			credentials: 'include'
-		});
+	getLatest(customFetch?: Fetch): Promise<Guess[]> {
+		return this._makeRequest(
+			'/user/latest',
+			{
+				credentials: 'include'
+			},
+			customFetch
+		);
 	}
 };

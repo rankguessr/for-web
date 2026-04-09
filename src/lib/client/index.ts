@@ -38,7 +38,12 @@ export type Beatmap = {
 
 export type RoomInfo = {
 	score: Score;
-	is_closed: boolean;
+	guess: Guess | null;
+};
+
+export type Room = {
+	id: string;
+	score: Score;
 };
 
 export type Score = {
@@ -93,7 +98,20 @@ export const client = {
 		});
 	},
 
-	createRoom(): Promise<{ session_id: string }> {
+	getRoomNextScore(roomId: string): Promise<RoomInfo> {
+		return this._makeRequest(`/room/${roomId}/next`, {
+			method: 'POST',
+			credentials: 'include'
+		});
+	},
+
+	getCurrentRoom(): Promise<{ room: Room | null }> {
+		return this._makeRequest('/user/current-room', {
+			credentials: 'include'
+		});
+	},
+
+	createRoom(): Promise<{ room_id: string }> {
 		return this._makeRequest('/room/start', {
 			method: 'POST',
 			credentials: 'include'

@@ -2,14 +2,9 @@
 	import { setContext } from 'svelte';
 	import type { LayoutProps } from './$types';
 	import './layout.css';
-	import {
-		Footer,
-		FooterCopyright,
-		FooterLink,
-		FooterLinkGroup,
-		ThemeProvider
-	} from 'flowbite-svelte';
+	import { ThemeProvider } from 'flowbite-svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
+
 	let { children, data }: LayoutProps = $props();
 
 	setContext('user', () => data.user);

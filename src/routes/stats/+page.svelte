@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import {
 		Badge,
 		Card,
@@ -12,10 +11,13 @@
 		TableHeadCell
 	} from 'flowbite-svelte';
 	import { client } from '$lib/client';
-	import { Car } from '@lucide/svelte';
 
 	const stats = client.getPublicStats();
 </script>
+
+<svelte:head>
+	<title>rankguessr - statistics</title>
+</svelte:head>
 
 {#await stats}
 	<section class="flex w-full flex-1 items-center justify-center">

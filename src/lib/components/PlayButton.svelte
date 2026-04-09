@@ -4,16 +4,21 @@
 	let { url, shouldPlay }: { url: string; shouldPlay: boolean } = $props();
 
 	let isPlaying = $state(false);
-	let song = $state(new Audio(url));
+	let audioUrl = $derived(url);
+	let song = $derived(new Audio(audioUrl));
 
-	song.volume = 0.2;
-	song.onended = () => {
-		isPlaying = false;
-	};
+	$effect(() => {
+		song.volume = 0.2;
+		song.onended = () => {
+			isPlaying = false;
+		};
+	});
 
-	if (shouldPlay) {
-		isPlaying = true;
-	}
+	$effect(() => {
+		if (shouldPlay) {
+			isPlaying = true;
+		}
+	});
 
 	$effect(() => {
 		if (isPlaying) {

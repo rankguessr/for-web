@@ -6,26 +6,28 @@
 	import { goto } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
-	import PlayButton from '$lib/components/PlayButton.svelte';
+	import ScoreCard from '$lib/components/ScoreCard.svelte';
 
-	let { params }: PageProps = $props();
+	let { params, data }: PageProps = $props();
 
 	let sessionId = $derived(params.id);
 
 	const getUser = getContext<() => User | null>('user');
 	const user = $derived(getUser());
 
-	if (!user) {
-		goto('/');
-	}
+	$effect(() => {
+		if (!user) {
+			goto('/login');
+		}
+	});
 
 	let guessInput = $state<number>(1);
 	let errorMessage = $state<string | null>(null);
 	let result = $state<Guess | null>(null);
+	let loadingNext = $state(false);
+	let room = $derived(data.room);
 
 	let submitting = $state(false);
-
-	let room = client.getRoom(sessionId);
 
 	async function submitGuess() {
 		submitting = true;
@@ -38,69 +40,49 @@
 			submitting = false;
 		}
 	}
+
+	async function getNextScore() {
+		loadingNext = true;
+		errorMessage = null;
+		try {
+			room = await client.getRoomNextScore(sessionId);
+			result = null;
+			guessInput = 0;
+		} catch (e) {
+			console.error('Error getting next score:', e);
+			errorMessage = 'Failed to load next score.';
+		} finally {
+			loadingNext = false;
+		}
+	}
 </script>
 
-<section class="flex w-full flex-1 flex-col items-center justify-center gap-6 py-8">
-	{#await room}
-		<Spinner type="default" color="primary" />
-	{:then room}
-		{@const score = room.score}
-		{@const stats = score.statistics}
+<svelte:head>
+	<title>rankguessr - in room {params.id}</title>
+</svelte:head>
 
+<section class="flex w-full flex-1 flex-col items-center justify-center gap-6 py-8">
+	{#if !room}
+		<Card>
+			<p class="text-red-400">{errorMessage}</p>
+		</Card>
+	{:else if loadingNext}
+		<Spinner type="default" color="primary" />
+	{:else}
 		<div class="flex min-w-3xl flex-col items-center gap-5">
 			<div class="flex w-full flex-col gap-1">
 				<div class="flex items-center gap-2">
-					<Badge color="purple">Session</Badge>
+					<Badge color="purple">Room</Badge>
 					{#if sessionId}<Badge color="gray">{sessionId}</Badge>{/if}
 				</div>
 				<h1 class="text-3xl font-bold">Guess player rank from replay</h1>
 			</div>
 
-			<div
-				class="min-w-full rounded-md p-4"
-				style={`
-					background: 
-						linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-						url(${score.beatmapset?.covers.slimcover}); 
-					background-size: cover; 
-					background-position: center;
-				`}
-			>
-				<div class="flex justify-between">
-					<div class="mb-2 flex items-center gap-1">
-						<PlayButton url={score.beatmapset.preview_url} shouldPlay={false} />
-						<h3 class="text-lg font-semibold">Score metadata</h3>
-					</div>
-					<p>
-						<span class="font-bold text-green-500">{stats.count_100}</span> /
-						<span class="font-bold text-yellow-500">{stats.count_50}</span> /
-						<span class="font-bold text-red-500">{stats.count_miss}</span>
-					</p>
-				</div>
-				<p class="text-gray-400">
-					{score.beatmapset?.artist} - {score.beatmapset?.title}
-				</p>
-				<div class="mt-3 flex justify-between">
-					<div class="flex gap-1">
-						<Badge color="blue">pp: {Math.round(score.pp)}</Badge>
-						<Badge color="cyan">acc: {(score.accuracy * 100).toFixed(2)}%</Badge>
-						{#if score.beatmap?.difficulty_rating}
-							<Badge color="purple">★ {score.beatmap.difficulty_rating.toFixed(2)}</Badge>
-						{/if}
-					</div>
-					<div class="flex gap-0.5">
-						{#if score.mods.length > 0}
-							{#each score.mods as mod}
-								<Badge color="yellow">{mod}</Badge>
-							{/each}
-						{:else}
-							<Badge color="gray">NM</Badge>
-						{/if}
-					</div>
-				</div>
+			<div class="w-full">
+				<ScoreCard score={room.score} shouldPlayPreview={false} />
 			</div>
 
-			{#if !result}
+			{#if !result && !room.guess}
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">1) Download replay</h2>
 					<p class="mb-4 text-gray-400">
@@ -131,40 +113,29 @@
 						class="mt-4 w-full"
 						color="green"
 						onclick={submitGuess}
-						disabled={!guessInput || submitting || room.is_closed}
+						disabled={!guessInput || submitting || !!room.guess}
 					>
 						{submitting ? 'Submitting...' : 'Submit guess'}
 					</Button>
 				</Card>
 			{:else}
+				{@const res = result || room.guess}
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Result</h2>
-					<p class="text-xl">Your guess: #{result.guess}</p>
+					<p class="text-xl">Your guess: #{res?.guess}</p>
 					<p class="text-xl">
 						Actual global rank:
 						<span class="font-bold">
-							<ActualRank rank={result.actual_rank} elo={result.elo} />
+							<ActualRank rank={res!.actual_rank} elo={res!.elo} />
 						</span>
 					</p>
 				</Card>
 
 				<div class="flex">
-					<Button
-						color="primary"
-						onclick={() => {
-							result = null;
-							errorMessage = null;
-						}}
-					>
-						Play again
-					</Button>
+					<Button color="primary" onclick={getNextScore}>Play again</Button>
 					<Button class="ml-2" color="gray" onclick={() => goto('/')}>Return home</Button>
 				</div>
 			{/if}
 		</div>
-	{:catch}
-		<Card>
-			<p class="text-red-400">{errorMessage}</p>
-		</Card>
-	{/await}
+	{/if}
 </section>

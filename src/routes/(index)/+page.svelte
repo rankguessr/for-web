@@ -17,7 +17,7 @@
 	} from 'flowbite-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
-	import type { PageData, PageProps } from './$types';
+	import type { PageProps } from './$types';
 
 	const { data }: PageProps = $props();
 	const latest = $derived(data.latest);

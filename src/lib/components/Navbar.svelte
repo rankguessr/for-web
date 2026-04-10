@@ -15,6 +15,7 @@
 		<NavUl>
 			<NavLi href="/stats">statistics</NavLi>
 			<NavLi href="https://ko-fi.com/harvywtf" target="_blank">support me</NavLi>
+			<NavLi href="https://github.com/rankguessr/api" target="_blank">source code</NavLi>
 		</NavUl>
 	</div>
 

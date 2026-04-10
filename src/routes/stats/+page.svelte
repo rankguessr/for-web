@@ -24,7 +24,7 @@
 					<h2 class="text-xl font-semibold">Best guessers</h2>
 				</div>
 
-				<div class="flex flex-col gap-2">
+				<div class="flex flex-col gap-3">
 					{#each top_users as user (user.osu_id)}
 						<a
 							href={`https://osu.ppy.sh/users/${user.osu_id}`}

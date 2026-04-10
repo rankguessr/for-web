@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import { client, type Guess, type User } from '$lib/client';
-	import { Badge, Button, Card, Spinner } from 'flowbite-svelte';
+	import { client, type Guess, type Player, type User } from '$lib/client';
+	import { Avatar, Badge, Button, Card, Indicator, Spinner } from 'flowbite-svelte';
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
@@ -10,7 +10,7 @@
 
 	let { params, data }: PageProps = $props();
 
-	let sessionId = $derived(params.id);
+	const sessionId = $derived(params.id);
 
 	const getUser = getContext<() => User | null>('user');
 	const user = $derived(getUser());
@@ -23,7 +23,7 @@
 
 	let guessInput = $state<number>(1);
 	let errorMessage = $state<string | null>(null);
-	let result = $state<Guess | null>(null);
+	let result = $state<{ guess: Guess; player: Player } | null>(null);
 	let loadingNext = $state(false);
 	let room = $derived(data.room);
 
@@ -61,7 +61,7 @@
 	<title>rankguessr - in room {params.id}</title>
 </svelte:head>
 
-<section class="flex w-full flex-1 flex-col items-center justify-center gap-6 py-8">
+<section class="flex min-w-full flex-1 flex-col items-center justify-center gap-6 py-8">
 	{#if !room}
 		<Card>
 			<p class="text-red-400">{errorMessage}</p>
@@ -69,7 +69,7 @@
 	{:else if loadingNext}
 		<Spinner type="default" color="primary" />
 	{:else}
-		<div class="flex min-w-3xl flex-col items-center gap-5">
+		<div class="flex w-full flex-col items-center gap-5 md:w-3xl">
 			<div class="flex w-full flex-col gap-1">
 				<div class="flex items-center gap-2">
 					<Badge color="purple">Room</Badge>
@@ -84,20 +84,25 @@
 
 			{#if !result && !room.guess}
 				<Card class="min-w-full p-4 py-6">
-					<h2 class="mb-3 text-xl font-semibold">1) Download replay</h2>
+					<h2 class="mb-3 text-xl font-semibold">Download replay</h2>
 					<p class="mb-4 text-gray-400">
 						Download anonymized .osr replay, open it in osu!, then estimate the player's global
 						rank.
 					</p>
 
-					<Button href={`${PUBLIC_API_URL}/room/replay/${params.id}.osr`} color="primary">
+					<Button
+						href={`${PUBLIC_API_URL}/room/replay/${params.id}.osr`}
+						download
+						target="_blank"
+						color="primary"
+					>
 						Download .osr replay
 					</Button>
 				</Card>
 
 				<Card class="min-w-full p-4 py-6">
-					<h2 class="mb-3 text-xl font-semibold">2) Submit guess</h2>
-					<label for="guess-rank-input" class="mb-2 block text-sm font-medium"
+					<h2 class="mb-3 text-xl font-semibold">Submit guess</h2>
+					<label for="guess-rank-input" class="mb-2 block text-sm font-medium text-gray-400"
 						>Global rank guess</label
 					>
 					<input
@@ -119,17 +124,47 @@
 					</Button>
 				</Card>
 			{:else}
-				{@const res = result || room.guess}
+				{@const res = result ? result : { guess: room.guess, player: room.score.user }}
+				{@const guess = res?.guess}
+				{@const player = res?.player}
+
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Result</h2>
-					<p class="text-xl">Your guess: #{res?.guess}</p>
+					<p class="text-xl">Your guess: #{guess?.guess}</p>
 					<p class="text-xl">
 						Actual global rank:
 						<span class="font-bold">
-							<ActualRank rank={res!.actual_rank} elo={res!.elo} />
+							<ActualRank rank={guess!.actual_rank} elo={guess!.elo} />
 						</span>
 					</p>
 				</Card>
+
+				<a
+					href={`https://osu.ppy.sh/users/${player?.id}`}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="w-full"
+				>
+					<Card class="min-w-full p-4">
+						<div class="flex items-center gap-4">
+							<Avatar
+								size="md"
+								src={player?.avatar_url}
+								alt="Player avatar"
+								dot={{ placement: 'bottom-right', color: player?.is_online ? 'green' : 'gray' }}
+							/>
+
+							<div class="flex items-center justify-center gap-2 rounded-md">
+								<p class="text-lg font-semibold">{player?.username}</p>
+								<img
+									class="h-6 w-6"
+									alt="Country flag"
+									src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${player?.country_code}.svg`}
+								/>
+							</div>
+						</div>
+					</Card>
+				</a>
 
 				<div class="flex">
 					<Button color="primary" onclick={getNextScore}>Play again</Button>

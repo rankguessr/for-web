@@ -17,10 +17,23 @@ export class ServerError extends Error {
 }
 
 export type User = {
+	elo: number;
 	osu_id: number;
 	username: string;
 	country_code: string;
 	avatar_url: string;
+};
+
+export type Player = {
+	id: number;
+	username: string;
+	country_code: string;
+	avatar_url: string;
+	is_online: boolean;
+	statistics: {
+		pp: number;
+		global_rank: number;
+	};
 };
 
 export type BeatmapSet = {
@@ -60,19 +73,23 @@ export type Score = {
 		count_katu: number;
 	};
 	beatmapset: BeatmapSet;
+	user: Player;
 };
 
 export type PublicStats = {
 	count_24h: number;
 	count_global: number;
 	best: Guess[];
-	latest: Guess[];
+	top_users: User[];
 };
 
 export type Guess = {
 	id: string;
 	elo: number;
 	guess: number;
+	score_id: number;
+	beatmap_id: number;
+	beatmapset_id: number;
 	actual_rank: number;
 	created_at: string;
 };
@@ -146,15 +163,23 @@ export const client = {
 		);
 	},
 
-	submitGuess(roomId: string, guess: number, customFetch?: Fetch): Promise<Guess> {
-		return this._makeRequest(`/room/${roomId}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
+	submitGuess(
+		roomId: string,
+		guess: number,
+		customFetch?: Fetch
+	): Promise<{ guess: Guess; player: Player }> {
+		return this._makeRequest(
+			`/room/${roomId}`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ guess }),
+				credentials: 'include'
 			},
-			body: JSON.stringify({ guess }),
-			credentials: 'include'
-		});
+			customFetch
+		);
 	},
 
 	getMe(customFetch?: Fetch): Promise<User> {

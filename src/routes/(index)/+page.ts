@@ -5,8 +5,10 @@ export const load: PageLoad = async ({ parent, fetch }) => {
 	const { user } = await parent();
 	if (user) {
 		try {
-			const latest = await client.getLatest(fetch);
-			const currentRoom = await client.getCurrentRoom(fetch);
+			const [latest, currentRoom] = await Promise.all([
+				client.getLatest(fetch),
+				client.getCurrentRoom(fetch)
+			]);
 
 			return {
 				room: currentRoom?.room,

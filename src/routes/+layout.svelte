@@ -31,7 +31,7 @@
 	<main class="flex min-h-screen w-full flex-col dark bg-gray-900 text-white">
 		<div class="mx-auto flex min-h-screen w-full flex-col">
 			<Navbar user={data.user} />
-			<div class="flex w-full flex-1 flex-col">
+			<div class="flex w-full flex-1 flex-col px-4">
 				{#if loading}
 					<div class="flex flex-1 items-center justify-center">
 						<Spinner type="default" color="primary" />

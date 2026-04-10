@@ -14,6 +14,7 @@
 
 		<NavUl>
 			<NavLi href="/stats">statistics</NavLi>
+			<NavLi href="https://ko-fi.com/harvywtf" target="_blank">support me</NavLi>
 		</NavUl>
 	</div>
 
@@ -21,6 +22,7 @@
 		{#if user}
 			<div class="hidden text-right sm:block">
 				<p class="text-xs font-medium sm:text-sm">{user.username}</p>
+				<p class="text-xs font-semibold">({user.elo} elo)</p>
 			</div>
 			<Avatar src={user.avatar_url} alt={user.username} class="h-8 w-8" />
 		{:else}

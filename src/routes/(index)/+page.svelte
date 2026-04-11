@@ -52,7 +52,7 @@
 				</div>
 				<h1 class="text-4xl font-bold">Guess osu! global rank from replay</h1>
 				<p class="text-gray-500 dark:text-gray-400">
-					Download random player's top 5 replay, watch it and try to get an exact guess!
+					Download random player's one of top 20 replays, watch it and try to get an exact guess!
 				</p>
 			</div>
 

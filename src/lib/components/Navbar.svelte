@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_DONATION_URL, PUBLIC_GITHUB_URL } from '$env/static/public';
 	import { getUserContext } from '$lib/context';
 	import { LogOut } from '@lucide/svelte';
 	import { Avatar, Button, Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
@@ -15,8 +15,8 @@
 
 		<NavUl>
 			<NavLi href="/stats">statistics</NavLi>
-			<NavLi href="https://ko-fi.com/harvywtf" target="_blank">support me</NavLi>
-			<NavLi href="https://github.com/rankguessr/api" target="_blank">source code</NavLi>
+			<NavLi href={PUBLIC_DONATION_URL} target="_blank">support me</NavLi>
+			<NavLi href={PUBLIC_GITHUB_URL} target="_blank">source code</NavLi>
 		</NavUl>
 	</div>
 

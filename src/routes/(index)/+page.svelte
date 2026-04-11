@@ -57,7 +57,7 @@
 			</div>
 
 			<div class="flex w-full flex-wrap items-center gap-3">
-				{#if user}
+				{#if $user}
 					<Button
 						color="primary"
 						class="cursor-pointer"
@@ -97,7 +97,7 @@
 			<a class="row-span-1 max-w-full" href={`/room/${room.id}`}>
 				<ScoreCard score={room.score} showPlayButton={false} title="Current Room" />
 			</a>
-		{:else if user}
+		{:else if $user}
 			<Card class="row-span-1 min-w-full gap-4 p-4">
 				<div class="flex items-center justify-start gap-1.5 text-xl font-semibold">
 					<FrownIcon /> No active rooms
@@ -109,7 +109,7 @@
 		{/if}
 	</div>
 
-	{#if user}
+	{#if $user}
 		<Card class="flex max-w-full flex-col gap-3 p-4 py-5 md:w-xl">
 			<div class="mb-4 flex items-center justify-between">
 				<div class="flex items-center gap-2">

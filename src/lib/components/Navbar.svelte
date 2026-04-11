@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PUBLIC_API_URL } from '$env/static/public';
-	import type { User } from '$lib/client';
 	import { getUserContext } from '$lib/context';
+	import { LogOut } from '@lucide/svelte';
 	import { Avatar, Button, Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
 
 	const user = getUserContext();
@@ -27,6 +27,9 @@
 				<p class="text-xs font-semibold">({$user.elo} elo)</p>
 			</div>
 			<Avatar src={$user.avatar_url} alt={$user.username} class="h-8 w-8" />
+			<a href={`${PUBLIC_API_URL}/auth/logout`}>
+				<LogOut size={20} />
+			</a>
 		{:else}
 			<Button href={`${PUBLIC_API_URL}/auth/login`} size="sm" color="primary"
 				>Login with osu!</Button

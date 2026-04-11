@@ -167,7 +167,7 @@ export const client = {
 		roomId: string,
 		guess: number,
 		customFetch?: Fetch
-	): Promise<{ guess: Guess; player: Player }> {
+	): Promise<{ guess: Guess; player: Player; new_elo: number }> {
 		return this._makeRequest(
 			`/room/${roomId}`,
 			{

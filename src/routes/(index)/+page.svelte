@@ -9,13 +9,13 @@
 	import type { PageProps } from './$types';
 	import OsuIcon from '$lib/components/icons/OsuIcon.svelte';
 	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
+	import { getUserContext } from '$lib/context';
 
 	const { data }: PageProps = $props();
 	const latest = $derived(data.latest?.slice(0, 10));
 	const room = $derived(data.room);
 
-	const getUser = getContext<() => User | null>('user');
-	const user = $derived(getUser());
+	const user = getUserContext();
 
 	async function createRoom() {
 		try {

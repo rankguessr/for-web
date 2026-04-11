@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, setContext } from 'svelte';
 	import { client, type Guess, type Player, type User } from '$lib/client';
 	import { Avatar, Badge, Button, Card, Indicator, Spinner } from 'flowbite-svelte';
 	import type { PageProps } from './$types';
@@ -7,13 +7,13 @@
 	import ActualRank from '$lib/components/ActualRank.svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
+	import { getUserContext, setUserContext } from '$lib/context';
 
 	let { params, data }: PageProps = $props();
 
 	const sessionId = $derived(params.id);
 
-	const getUser = getContext<() => User | null>('user');
-	const user = $derived(getUser());
+	const user = getUserContext();
 
 	$effect(() => {
 		if (!user) {
@@ -32,7 +32,11 @@
 	async function submitGuess() {
 		submitting = true;
 		try {
-			result = await client.submitGuess(sessionId, guessInput);
+			const resp = await client.submitGuess(sessionId, guessInput);
+			result = { guess: resp.guess, player: resp.player };
+			if ($user) {
+				$user = { ...$user, elo: resp.new_elo };
+			}
 		} catch (e) {
 			console.error('Error submitting guess:', e);
 			errorMessage = 'Failed to submit guess.';

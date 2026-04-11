@@ -79,7 +79,7 @@ export type Score = {
 export type PublicStats = {
 	count_24h: number;
 	count_global: number;
-	best: Guess[];
+	best: GuessExtended[];
 	top_users: User[];
 };
 
@@ -92,6 +92,10 @@ export type Guess = {
 	beatmapset_id: number;
 	actual_rank: number;
 	created_at: string;
+};
+
+export type GuessExtended = Guess & {
+	user: User;
 };
 
 export type Fetch = typeof fetch;

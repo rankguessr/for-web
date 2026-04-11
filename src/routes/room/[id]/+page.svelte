@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { getContext, setContext } from 'svelte';
-	import { client, type Guess, type Player, type User } from '$lib/client';
-	import { Avatar, Badge, Button, Card, Indicator, Spinner } from 'flowbite-svelte';
+	import { client, type Guess, type Player } from '$lib/client';
+	import { Avatar, Badge, Button, Card, Spinner } from 'flowbite-svelte';
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';

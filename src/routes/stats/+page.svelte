@@ -2,6 +2,7 @@
 	import { Avatar, Card, Spinner } from 'flowbite-svelte';
 	import { client } from '$lib/client';
 	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
+	import GuessRow from '$lib/components/GuessRow.svelte';
 
 	const stats = client.getPublicStats();
 </script>
@@ -68,7 +69,15 @@
 						<h2 class="text-xl font-semibold">Best guesses (24h)</h2>
 					</div>
 
-					<GuessesColumn guesses={best} cap={8} />
+					<div class="flex w-full flex-1 flex-col gap-2">
+						{#if best.length > 0}
+							{#each best.slice(0, 8) as item}
+								<GuessRow guess={item} user={item.user} />
+							{/each}
+						{:else}
+							<div class="font-semibold">No guesses available.</div>
+						{/if}
+					</div>
 				</Card>
 			</div>
 		</div>

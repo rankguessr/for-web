@@ -5,7 +5,7 @@
 	let { guesses, cap = 5 }: { guesses: Guess[]; cap?: number } = $props();
 </script>
 
-<div class="flex flex-1 flex-col gap-2">
+<div class="flex w-full flex-1 flex-col gap-2">
 	{#if guesses.length > 0}
 		{#each guesses.slice(0, cap) as item}
 			<GuessRow guess={item} />

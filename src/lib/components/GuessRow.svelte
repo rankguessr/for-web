@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Guess } from '$lib/client';
 	import { getGuessCoverURL } from '$lib/utils';
-	import { TableBodyRow, TableBodyCell, Badge } from 'flowbite-svelte';
+	import { Badge } from 'flowbite-svelte';
 
 	let { guess }: { guess: Guess } = $props();
 </script>

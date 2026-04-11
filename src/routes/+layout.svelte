@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { setContext } from 'svelte';
 	import type { LayoutProps } from './$types';
 	import './layout.css';
 	import { Spinner, ThemeProvider } from 'flowbite-svelte';

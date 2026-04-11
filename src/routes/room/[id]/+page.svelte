@@ -107,12 +107,13 @@
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Submit guess</h2>
 					<label for="guess-rank-input" class="mb-2 block text-sm font-medium text-gray-400"
-						>Global rank guess</label
+						>Global rank guess (less than 3mil)</label
 					>
 					<input
 						id="guess-rank-input"
 						type="number"
 						min="1"
+						max="3000000"
 						bind:value={guessInput}
 						placeholder="e.g. 1250"
 						class="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500"

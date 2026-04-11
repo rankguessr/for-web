@@ -101,18 +101,26 @@ export type GuessExtended = Guess & {
 export type Fetch = typeof fetch;
 
 export const client = {
-	async _makeRequest<T>(path: string, options?: RequestInit, customFetch?: Fetch): Promise<T> {
+	async _makeAndHandleUnexpected(
+		path: string,
+		options?: RequestInit,
+		customFetch?: Fetch
+	): Promise<Response> {
 		try {
-			const resp = await (customFetch || fetch)(`${PUBLIC_API_URL}${path}`, options);
-			if (!resp.ok) {
-				const data = await resp.json();
-				throw new ServerError(data.message, resp.status);
-			}
-
-			return resp.json();
+			return await (customFetch || fetch)(`${PUBLIC_API_URL}${path}`, options);
 		} catch (err) {
-			throw new ClientError('An unexpected error occurred while making the API request: ' + err);
+			throw new ClientError(err instanceof Error ? err.message : String(err));
 		}
+	},
+
+	async _makeRequest<T>(path: string, options?: RequestInit, customFetch?: Fetch): Promise<T> {
+		const resp = await this._makeAndHandleUnexpected(path, options, customFetch);
+		if (!resp.ok) {
+			const data = await resp.json();
+			throw new ServerError(data.message, resp.status);
+		}
+
+		return resp.json();
 	},
 
 	getPublicStats(customFetch?: Fetch): Promise<PublicStats> {

@@ -7,6 +7,7 @@
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import { getUserContext, setUserContext } from '$lib/context';
+	import { CircleAlert } from '@lucide/svelte';
 
 	let { params, data }: PageProps = $props();
 
@@ -66,8 +67,14 @@
 
 <section class="flex min-w-full flex-1 flex-col items-center justify-center gap-6 py-8">
 	{#if !room}
-		<Card>
-			<p class="text-red-400">{errorMessage}</p>
+		<Card class="flex w-full flex-col justify-between gap-4 p-4 md:min-h-36 md:min-w-xl md:p-6">
+			<h1 class="flex items-center gap-2 text-lg font-semibold">
+				<CircleAlert size={23} />Room not found
+			</h1>
+			<p class="text-md">
+				The room you are looking for does not exist. If error persists, please contact me on
+				discord: <span class="font-semibold">@harvywtf</span>
+			</p>
 		</Card>
 	{:else if loadingNext}
 		<Spinner type="default" color="primary" />

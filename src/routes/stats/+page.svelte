@@ -18,17 +18,17 @@
 	{@const { best, top_users } = stats}
 
 	<section class="flex w-full flex-1 justify-center py-4">
-		<div class="grid w-3xl grid-cols-2 gap-4">
-			<Card class="col-span-1 p-3">
-				<div class="mb-6 flex items-center gap-2">
+		<div class="grid w-2xl grid-cols-1 gap-4 sm:grid-cols-2 md:w-3xl">
+			<Card class="col-span-1 flex w-full max-w-md p-3">
+				<div class="mb-6 flex w-full items-center gap-2">
 					<h2 class="text-xl font-semibold">Best guessers</h2>
 				</div>
 
-				<div class="flex flex-col gap-3">
+				<div class="flex w-full flex-col gap-3">
 					{#each top_users as user (user.osu_id)}
 						<a
 							href={`https://osu.ppy.sh/users/${user.osu_id}`}
-							class="flex items-center justify-between"
+							class="flex w-full items-center justify-between"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -51,8 +51,8 @@
 				</div>
 			</Card>
 
-			<div class="col-span-1 flex w-full flex-col gap-4">
-				<div class="flex w-full gap-2">
+			<div class="col-span-1 flex flex-col gap-4">
+				<div class="flex gap-2">
 					<Card class="p-2">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses today</p>
 						<div class="mt-2 text-4xl font-bold">{stats.count_24h}</div>
@@ -64,7 +64,7 @@
 				</div>
 
 				<Card class="h-full p-3">
-					<div class="mb-4 flex items-center gap-2">
+					<div class="mb-4 items-center gap-2">
 						<h2 class="text-xl font-semibold">Best guesses (24h)</h2>
 					</div>
 

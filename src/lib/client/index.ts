@@ -144,16 +144,6 @@ export const client = {
 		);
 	},
 
-	getCurrentRoom(customFetch?: Fetch): Promise<{ room: Room | null }> {
-		return this._makeRequest(
-			'/user/current-room',
-			{
-				credentials: 'include'
-			},
-			customFetch
-		);
-	},
-
 	createRoom(customFetch?: Fetch): Promise<{ room_id: string }> {
 		return this._makeRequest(
 			'/room/start',
@@ -204,9 +194,9 @@ export const client = {
 		);
 	},
 
-	getLatest(customFetch?: Fetch): Promise<Guess[]> {
+	getRoomAndLatest(customFetch?: Fetch): Promise<{ room: Room | null; latest: Guess[] }> {
 		return this._makeRequest(
-			'/user/latest',
+			'/user/rooms',
 			{
 				credentials: 'include'
 			},

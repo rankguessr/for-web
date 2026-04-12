@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { client, type User } from '$lib/client';
+	import { client } from '$lib/client';
 	import { Gamepad2, Trophy, Clock4, FrownIcon } from '@lucide/svelte';
 	import { Button, Card, Badge } from 'flowbite-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';

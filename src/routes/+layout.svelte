@@ -8,6 +8,7 @@
 	import { dev } from '$app/environment';
 	import { setUserContext } from '$lib/context';
 	import { writable } from 'svelte/store';
+	import UpdateModal from '$lib/components/UpdateModal.svelte';
 
 	injectAnalytics({ mode: dev ? 'development' : 'production' });
 
@@ -38,6 +39,10 @@
 						<Spinner type="default" color="primary" />
 					</div>
 				{:else}
+					{#if $user}
+						<UpdateModal />
+					{/if}
+
 					{@render children()}
 				{/if}
 			</div>

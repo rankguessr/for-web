@@ -44,7 +44,7 @@
 <section class="flex max-w-full flex-1 flex-col justify-center gap-4 py-4 md:flex-row">
 	<div class={`grid grid-cols-1 gap-4 md:w-xl ${$user ? 'grid-rows-4' : 'grid-rows-5'}`}>
 		<Card
-			class={`relative row-span-3 max-w-full items-center justify-center gap-5 p-5 ${$user ? '' : 'row-end-5'}`}
+			class={`relative row-span-3 max-w-full items-center justify-center gap-5 px-5 py-10 ${$user ? '' : 'row-end-5'}`}
 		>
 			<div class="w-full space-y-2">
 				<div class="flex items-center gap-2">

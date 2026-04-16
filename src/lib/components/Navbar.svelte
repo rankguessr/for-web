@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { PUBLIC_API_URL, PUBLIC_DONATION_URL, PUBLIC_GITHUB_URL } from '$env/static/public';
 	import { getUserContext } from '$lib/context';
+	import { formatNumber } from '$lib/utils';
 	import { LogOut } from '@lucide/svelte';
 	import { Avatar, Button, Navbar, NavBrand, NavLi, NavUl } from 'flowbite-svelte';
 
@@ -24,7 +25,7 @@
 		{#if $user}
 			<div class="hidden text-right sm:block">
 				<p class="text-xs font-medium sm:text-sm">{$user.username}</p>
-				<p class="text-xs font-semibold">({$user.elo} elo)</p>
+				<p class="text-xs font-semibold">({formatNumber($user.elo)} elo)</p>
 			</div>
 			<Avatar src={$user.avatar_url} alt={$user.username} class="h-8 w-8" />
 			<a href={`${PUBLIC_API_URL}/auth/logout`}>

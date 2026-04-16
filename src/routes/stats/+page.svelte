@@ -3,6 +3,7 @@
 	import { client } from '$lib/client';
 	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
 	import GuessRow from '$lib/components/GuessRow.svelte';
+	import { formatNumber } from '$lib/utils';
 
 	const stats = client.getPublicStats();
 </script>
@@ -46,7 +47,7 @@
 								</div>
 							</div>
 
-							<p class="font-semibold">{user.elo} elo</p>
+							<p class="font-semibold">{formatNumber(user.elo)} elo</p>
 						</a>
 					{/each}
 				</div>
@@ -56,11 +57,11 @@
 				<div class="flex gap-2">
 					<Card class="p-2">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses today</p>
-						<div class="mt-2 text-4xl font-bold">{stats.count_24h}</div>
+						<div class="mt-2 text-4xl font-bold">{formatNumber(stats.count_24h)}</div>
 					</Card>
 					<Card class="p-2">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses total</p>
-						<div class="mt-2 text-4xl font-bold">{stats.count_global}</div>
+						<div class="mt-2 text-4xl font-bold">{formatNumber(stats.count_global)}</div>
 					</Card>
 				</div>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Guess, User } from '$lib/client';
-	import { getGuessCoverURL } from '$lib/utils';
+	import { formatNumber, getGuessCoverURL } from '$lib/utils';
 	import { Avatar, Badge } from 'flowbite-svelte';
 
 	let { guess, user }: { guess: Guess; user?: User } = $props();
@@ -28,11 +28,11 @@
 		<div class="flex gap-2">
 			<div>
 				<p class="text-xs text-gray-400">Guess</p>
-				<p class="font-semibold">#{new Intl.NumberFormat().format(guess.guess)}</p>
+				<p class="font-semibold">#{formatNumber(guess.guess)}</p>
 			</div>
 			<div>
 				<p class="text-xs text-green-300">Actual</p>
-				<p class="font-semibold">#{new Intl.NumberFormat().format(guess.actual_rank)}</p>
+				<p class="font-semibold">#{formatNumber(guess.actual_rank)}</p>
 			</div>
 		</div>
 	</div>

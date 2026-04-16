@@ -5,8 +5,6 @@ export const load: PageLoad = async ({ params, fetch }) => {
 	try {
 		const room = await client.getRoom(params.id, fetch);
 
-		console.log(room);
-
 		return {
 			room,
 			error: null

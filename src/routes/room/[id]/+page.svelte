@@ -100,14 +100,26 @@
 						rank.
 					</p>
 
-					<Button
-						href={`${PUBLIC_API_URL}/room/replay/${params.id}.osr`}
-						download
-						target="_blank"
-						color="primary"
-					>
-						Download .osr replay
-					</Button>
+					<div class="grid grid-cols-3 grid-rows-1 gap-2">
+						<Button
+							href={`${PUBLIC_API_URL}/room/replay/${params.id}.osr`}
+							download
+							target="_blank"
+							color="primary"
+							class="col-span-2"
+						>
+							Download .osr replay
+						</Button>
+						<Button
+							href={`https://osu.ppy.sh/beatmapsets/${room.score.beatmap.beatmapset_id}`}
+							download
+							target="_blank"
+							color="gray"
+							class="col-span-1"
+						>
+							Download beatmap
+						</Button>
+					</div>
 				</Card>
 
 				<Card class="min-w-full p-4 py-6">

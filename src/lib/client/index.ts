@@ -46,6 +46,7 @@ export type BeatmapSet = {
 };
 
 export type Beatmap = {
+	beatmapset_id: number;
 	difficulty_rating: number;
 };
 

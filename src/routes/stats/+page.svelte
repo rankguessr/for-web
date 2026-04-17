@@ -1,22 +1,17 @@
 <script lang="ts">
 	import { Avatar, Card, Spinner } from 'flowbite-svelte';
-	import { client } from '$lib/client';
-	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
 	import GuessRow from '$lib/components/GuessRow.svelte';
 	import { formatNumber } from '$lib/utils';
 
-	const stats = client.getPublicStats();
+	const { data } = $props();
+	const stats = $derived(data.stats);
 </script>
 
 <svelte:head>
 	<title>rankguessr - statistics</title>
 </svelte:head>
 
-{#await stats}
-	<section class="flex w-full flex-1 items-center justify-center">
-		<Spinner type="default" color="primary" />
-	</section>
-{:then stats}
+{#if stats}
 	{@const { best, top_users } = stats}
 
 	<section class="flex w-full flex-1 items-center justify-center py-4">
@@ -83,4 +78,8 @@
 			</div>
 		</div>
 	</section>
-{/await}
+{:else}
+	<section class="flex w-full flex-1 items-center justify-center py-4">
+		<Card class="p-4">Failed to fetch statistics, please try again later</Card>
+	</section>
+{/if}

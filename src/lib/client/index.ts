@@ -12,7 +12,8 @@ export class ServerError extends Error {
 	readonly name = 'ServerError';
 
 	constructor(message: string, status: number) {
-		super(`API error ${status}: ${message}`);
+		console.error(`API error ${status}: ${message}`);
+		super(message);
 	}
 }
 

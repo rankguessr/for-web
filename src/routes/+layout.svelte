@@ -9,6 +9,7 @@
 	import { setUserContext } from '$lib/context';
 	import { writable } from 'svelte/store';
 	import UpdateModal from '$lib/components/UpdateModal.svelte';
+	import ToastsProvider from '$lib/components/ToastsProvider.svelte';
 
 	injectAnalytics({ mode: dev ? 'development' : 'production' });
 
@@ -42,6 +43,8 @@
 					{#if $user}
 						<UpdateModal />
 					{/if}
+
+					<ToastsProvider />
 
 					{@render children()}
 				{/if}

@@ -8,6 +8,7 @@
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import { getUserContext, setUserContext } from '$lib/context';
 	import { CircleAlert } from '@lucide/svelte';
+	import { toast } from '$lib/toasts';
 
 	let { params, data }: PageProps = $props();
 
@@ -22,7 +23,6 @@
 	});
 
 	let guessInput = $state<number>(1);
-	let errorMessage = $state<string | null>(null);
 	let result = $state<{ guess: Guess; player: Player } | null>(null);
 	let loadingNext = $state(false);
 	let room = $derived(data.room);
@@ -38,8 +38,7 @@
 				$user = { ...$user, elo: resp.new_elo };
 			}
 		} catch (e) {
-			console.error('Error submitting guess:', e);
-			errorMessage = 'Failed to submit guess.';
+			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
 		} finally {
 			submitting = false;
 		}
@@ -47,14 +46,12 @@
 
 	async function getNextScore() {
 		loadingNext = true;
-		errorMessage = null;
 		try {
 			room = await client.getRoomNextScore(sessionId);
 			result = null;
 			guessInput = 0;
 		} catch (e) {
-			console.error('Error getting next score:', e);
-			errorMessage = 'Failed to load next score.';
+			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
 		} finally {
 			loadingNext = false;
 		}

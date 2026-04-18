@@ -100,6 +100,11 @@ export type GuessExtended = Guess & {
 	user: User;
 };
 
+export type GuessRequest = {
+	guess: number;
+	token: string;
+};
+
 export type Fetch = typeof fetch;
 
 export const client = {
@@ -169,7 +174,7 @@ export const client = {
 
 	submitGuess(
 		roomId: string,
-		guess: number,
+		req: GuessRequest,
 		customFetch?: Fetch
 	): Promise<{ guess: Guess; player: Player; new_elo: number }> {
 		return this._makeRequest(
@@ -179,7 +184,7 @@ export const client = {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ guess }),
+				body: JSON.stringify(req),
 				credentials: 'include'
 			},
 			customFetch

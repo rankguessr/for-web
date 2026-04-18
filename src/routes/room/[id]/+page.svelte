@@ -6,9 +6,11 @@
 	import ActualRank from '$lib/components/ActualRank.svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
-	import { getUserContext, setUserContext } from '$lib/context';
+	import { getUserContext } from '$lib/context';
 	import { CircleAlert } from '@lucide/svelte';
+	import { Turnstile } from 'svelte-turnstile';
 	import { toast } from '$lib/toasts';
+	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 
 	let { params, data }: PageProps = $props();
 
@@ -22,6 +24,7 @@
 		}
 	});
 
+	let turnstileToken = $state<string | null>(null);
 	let guessInput = $state<number>(1);
 	let result = $state<{ guess: Guess; player: Player } | null>(null);
 	let loadingNext = $state(false);
@@ -29,10 +32,24 @@
 
 	let submitting = $state(false);
 
+	$effect(() => {
+		if (turnstileToken) {
+			console.log('Turnstile token:', turnstileToken);
+		}
+	});
+
 	async function submitGuess() {
+		if (!turnstileToken) {
+			toast.error('Please complete the captcha before submitting your guess.');
+			return;
+		}
+
 		submitting = true;
 		try {
-			const resp = await client.submitGuess(sessionId, guessInput);
+			const resp = await client.submitGuess(sessionId, {
+				guess: guessInput,
+				token: turnstileToken
+			});
 			result = { guess: resp.guess, player: resp.player };
 			if ($user) {
 				$user = { ...$user, elo: resp.new_elo };
@@ -142,6 +159,22 @@
 					>
 						{submitting ? 'Submitting...' : 'Submit guess'}
 					</Button>
+
+					<Turnstile
+						siteKey={PUBLIC_TURNSTILE_SITE_KEY}
+						theme="dark"
+						class="mt-4 w-full"
+						size="flexible"
+						on:callback={(event) => (turnstileToken = event.detail.token)}
+						on:error={(event) => {
+							toast.error('Turnstile error: ' + event.detail.code);
+							turnstileToken = null;
+						}}
+						on:expired={() => {
+							toast.error('Turnstile expired. Please complete the captcha again.');
+							turnstileToken = null;
+						}}
+					/>
 				</Card>
 			{:else}
 				{@const res = result ? result : { guess: room.guess, player: room.score.user }}

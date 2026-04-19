@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { client } from '$lib/client';
+	import { client, type User } from '$lib/client';
 	import { Gamepad2, Trophy, Clock4, FrownIcon } from '@lucide/svelte';
 	import { Button, Card, Badge } from 'flowbite-svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
@@ -9,6 +9,10 @@
 	import OsuIcon from '$lib/components/icons/OsuIcon.svelte';
 	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
 	import { getUserContext } from '$lib/context';
+	import { onDestroy } from 'svelte';
+	import { toast } from '$lib/toasts';
+
+	const REFILL_INTERVAL = 3 * 60 * 1000;
 
 	const { data }: PageProps = $props();
 	const latest = $derived(data.latest?.slice(0, 10));
@@ -16,15 +20,51 @@
 
 	const user = getUserContext();
 
+	let availableGuesses = $state<number>(0);
+	let refillIn = $state<number | null>(null);
+	let intervalId = $state<ReturnType<typeof setInterval> | null>(null);
+
+	if ($user) {
+		updateInterval($user.refilled_at, $user.available_guesses);
+		intervalId = setInterval(() => {
+			updateInterval($user!.refilled_at, $user!.available_guesses);
+		}, 1000);
+	}
+
+	function updateInterval(refilled_at: Date, available_guesses: number) {
+		const now = Date.now();
+		const diff = now - new Date(refilled_at).getTime();
+
+		availableGuesses = Math.min(
+			15,
+			available_guesses +
+				Math.floor((new Date().getTime() - new Date(refilled_at).getTime()) / REFILL_INTERVAL)
+		);
+
+		refillIn = REFILL_INTERVAL - (diff % REFILL_INTERVAL);
+	}
+
+	function formatMillis(millis: number) {
+		const totalSeconds = Math.floor(millis / 1000);
+		const minutes = Math.floor(totalSeconds / 60);
+		const seconds = totalSeconds % 60;
+
+		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+	}
+
 	async function createRoom() {
 		try {
-			const { room_id } = await client.createRoom();
-			await goto(`/room/${room_id}`);
+			const { room_id, refill } = await client.createRoom();
+			if ($user) $user = { ...$user, ...refill };
+			if (room_id && room_id !== '') await goto(`/room/${room_id}`);
 		} catch (e) {
-			console.error('Error starting room:', e);
-			alert('Failed to start room.');
+			toast.error('Failed to create room');
 		}
 	}
+
+	onDestroy(() => {
+		if (intervalId) clearInterval(intervalId);
+	});
 </script>
 
 <svelte:head>
@@ -55,30 +95,40 @@
 				</p>
 			</div>
 
-			<div class="flex w-full flex-wrap items-center gap-3">
-				{#if $user}
-					<Button
-						color="primary"
-						class="cursor-pointer"
-						size="lg"
-						disabled={!!room}
-						onclick={createRoom}
-					>
-						<Gamepad2 class="mr-2 h-4 w-4" />
-						Start new game
-					</Button>
-					<Button color="alternative" href="/stats">
-						<Trophy class="mr-2 h-4 w-4" />
-						Statistics
-					</Button>
-				{:else}
+			{#if $user}
+				<div class="flex w-full flex-col gap-2">
+					<div class="flex w-full flex-wrap items-center gap-3">
+						<Button
+							color="primary"
+							class="cursor-pointer"
+							size="lg"
+							disabled={!!room}
+							onclick={createRoom}
+						>
+							<Gamepad2 class="mr-2 h-4 w-4" />
+							Start new game ({availableGuesses} / 15)
+						</Button>
+						<Button color="alternative" href="/stats">
+							<Trophy class="mr-2 h-4 w-4" />
+							Statistics
+						</Button>
+					</div>
+
+					{#if availableGuesses !== null && refillIn !== null && availableGuesses !== 15}
+						<p class="text-sm text-gray-500">
+							next guess in <span class="font-semibold">{formatMillis(refillIn)}</span>
+						</p>
+					{/if}
+				</div>
+			{:else}
+				<div class="flex w-full flex-wrap items-center gap-3">
 					{@render loginBtn()}
 					<Button color="alternative" href="/stats">
 						<Trophy class="mr-2 h-4 w-4" />
 						Statistics
 					</Button>
-				{/if}
-			</div>
+				</div>
+			{/if}
 
 			<div class="absolute bottom-3 left-5 text-gray-500">
 				<p>

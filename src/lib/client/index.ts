@@ -21,8 +21,15 @@ export type User = {
 	elo: number;
 	osu_id: number;
 	username: string;
-	country_code: string;
+	refilled_at: Date;
 	avatar_url: string;
+	country_code: string;
+	available_guesses: number;
+};
+
+export type RefillResult = {
+	refilled_at: Date;
+	available_guesses: number;
 };
 
 export type Player = {
@@ -54,6 +61,11 @@ export type Beatmap = {
 export type RoomInfo = {
 	score: Score;
 	guess: Guess | null;
+};
+
+export type RoomNextResp = {
+	score: Score;
+	refill: RefillResult;
 };
 
 export type Room = {
@@ -140,7 +152,7 @@ export const client = {
 		);
 	},
 
-	getRoomNextScore(roomId: string, customFetch?: Fetch): Promise<RoomInfo> {
+	getRoomNextScore(roomId: string, customFetch?: Fetch): Promise<RoomNextResp> {
 		return this._makeRequest(
 			`/room/${roomId}/next`,
 			{
@@ -151,7 +163,7 @@ export const client = {
 		);
 	},
 
-	createRoom(customFetch?: Fetch): Promise<{ room_id: string }> {
+	createRoom(customFetch?: Fetch): Promise<{ room_id: string; refill: RefillResult }> {
 		return this._makeRequest(
 			'/room/start',
 			{

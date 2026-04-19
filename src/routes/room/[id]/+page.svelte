@@ -51,9 +51,7 @@
 				token: turnstileToken
 			});
 			result = { guess: resp.guess, player: resp.player };
-			if ($user) {
-				$user = { ...$user, elo: resp.new_elo };
-			}
+			if ($user) $user = { ...$user, elo: resp.new_elo };
 		} catch (e) {
 			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
 		} finally {
@@ -64,9 +62,13 @@
 	async function getNextScore() {
 		loadingNext = true;
 		try {
-			room = await client.getRoomNextScore(sessionId);
+			const next = await client.getRoomNextScore(sessionId);
+
+			room = { guess: null, score: next.score };
 			result = null;
 			guessInput = 0;
+
+			if ($user) $user = { ...$user, ...next.refill };
 		} catch (e) {
 			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
 		} finally {

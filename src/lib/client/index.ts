@@ -61,16 +61,19 @@ export type Beatmap = {
 export type RoomInfo = {
 	score: Score;
 	guess: Guess | null;
+	closes_at: Date;
 };
 
 export type RoomNextResp = {
 	score: Score;
 	refill: RefillResult;
+	closes_at: Date;
 };
 
 export type Room = {
 	id: string;
 	score: Score;
+	closes_at: Date;
 };
 
 export type Score = {

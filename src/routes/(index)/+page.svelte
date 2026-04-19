@@ -15,8 +15,9 @@
 	const REFILL_INTERVAL = 3 * 60 * 1000;
 
 	const { data }: PageProps = $props();
+
+	let room = $derived(data.room);
 	const latest = $derived(data.latest?.slice(0, 10));
-	const room = $derived(data.room);
 
 	const user = getUserContext();
 
@@ -144,7 +145,13 @@
 
 		{#if room}
 			<a class="row-span-1 max-w-full" href={`/room/${room.id}`}>
-				<ScoreCard score={room.score} showPlayButton={false} title="Current Room" />
+				<ScoreCard
+					title="Current Room"
+					score={room.score}
+					showPlayButton={false}
+					closesAt={room.closes_at}
+					onClose={() => (room = null)}
+				/>
 			</a>
 		{:else if $user}
 			<Card class="row-span-1 min-w-full gap-4 p-4">

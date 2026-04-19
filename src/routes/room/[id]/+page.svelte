@@ -64,7 +64,7 @@
 		try {
 			const next = await client.getRoomNextScore(sessionId);
 
-			room = { guess: null, score: next.score };
+			room = { ...next, guess: null };
 			result = null;
 			guessInput = 0;
 

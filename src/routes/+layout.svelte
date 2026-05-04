@@ -4,14 +4,10 @@
 	import { Spinner, ThemeProvider } from 'flowbite-svelte';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { injectAnalytics } from '@vercel/analytics/sveltekit';
-	import { dev } from '$app/environment';
 	import { setUserContext } from '$lib/context';
 	import { writable } from 'svelte/store';
 	import UpdateModal from '$lib/components/UpdateModal.svelte';
 	import ToastsProvider from '$lib/components/ToastsProvider.svelte';
-
-	injectAnalytics({ mode: dev ? 'development' : 'production' });
 
 	let { children, data }: LayoutProps = $props();
 

@@ -1,4 +1,4 @@
-import { PUBLIC_API_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 export class ClientError extends Error {
 	readonly name = 'ClientError';
@@ -267,5 +267,5 @@ export class ApiClient {
 	}
 }
 
-export const newApiClient = (fetchFn: Fetch) => new ApiClient(PUBLIC_API_URL, fetchFn);
+export const newApiClient = (fetchFn: Fetch) => new ApiClient(env.PUBLIC_API_URL, fetchFn);
 export const client = newApiClient(fetch);

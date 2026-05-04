@@ -4,13 +4,12 @@
 	import type { PageProps } from './$types';
 	import { goto, invalidate } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import { getUserContext } from '$lib/context';
 	import { CircleAlert } from '@lucide/svelte';
 	import { Turnstile } from 'svelte-turnstile';
 	import { toast } from '$lib/toasts';
-	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 	import RoomCountdown from '$lib/components/RoomCountdown.svelte';
 	import { browser } from '$app/environment';
 
@@ -123,7 +122,7 @@
 
 					<div class="grid grid-cols-3 grid-rows-1 gap-2">
 						<Button
-							href={`${PUBLIC_API_URL}/room/replay/${params.id}.osr`}
+							href={`${env.PUBLIC_API_URL}/room/replay/${params.id}.osr`}
 							download
 							target="_blank"
 							color="primary"
@@ -168,7 +167,7 @@
 					</Button>
 
 					<Turnstile
-						siteKey={PUBLIC_TURNSTILE_SITE_KEY}
+						siteKey={env.PUBLIC_TURNSTILE_SITE_KEY}
 						theme="dark"
 						class="mt-4 w-full"
 						size="flexible"

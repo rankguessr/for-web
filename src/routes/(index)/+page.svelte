@@ -12,7 +12,7 @@
 		Label,
 		Input
 	} from 'flowbite-svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import type { PageProps } from './$types';
 	import OsuIcon from '$lib/components/icons/OsuIcon.svelte';
@@ -117,7 +117,7 @@
 </svelte:head>
 
 {#snippet loginBtn()}
-	<Button class="gap-2" color="primary" size="lg" href={`${PUBLIC_API_URL}/auth/login`}>
+	<Button class="gap-2" color="primary" size="lg" href={`${env.PUBLIC_API_URL}/auth/login`}>
 		<div class="h-6 w-6">
 			<OsuIcon />
 		</div>

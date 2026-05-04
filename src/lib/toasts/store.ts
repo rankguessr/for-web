@@ -16,10 +16,6 @@ export type Toast = {
 
 export const toasts = writable<Toast[]>([]);
 
-toasts.subscribe(($toasts) => {
-	console.log($toasts);
-});
-
 const timeoutIds = new Map<string, ReturnType<typeof setTimeout>>();
 
 const genId = (() => {

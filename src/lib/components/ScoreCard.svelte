@@ -2,17 +2,22 @@
 	import type { Score } from '$lib/client';
 	import { Badge } from 'flowbite-svelte';
 	import PlayButton from './PlayButton.svelte';
+	import RoomCountdown from './RoomCountdown.svelte';
 
 	let {
 		score,
 		title = 'Score Metadata',
 		showPlayButton = true,
-		shouldPlayPreview = false
+		shouldPlayPreview = false,
+		closesAt,
+		onClose
 	}: {
 		score: Score;
 		title?: string;
 		showPlayButton?: boolean;
 		shouldPlayPreview?: boolean;
+		closesAt?: Date;
+		onClose?: () => void;
 	} = $props();
 	let stats = $derived(score.statistics);
 </script>
@@ -33,11 +38,14 @@
 				<PlayButton url={score.beatmapset.preview_url} shouldPlay={shouldPlayPreview} />
 			{/if}
 			<h3 class="text-lg font-semibold">{title}</h3>
+			{#if closesAt}
+				<RoomCountdown {closesAt} {onClose} />
+			{/if}
 		</div>
 		<p>
-			<span class="font-bold text-green-500">{stats.count_100}</span> /
-			<span class="font-bold text-yellow-500">{stats.count_50}</span> /
-			<span class="font-bold text-red-500">{stats.count_miss}</span>
+			<span class="font-bold text-green-500">{stats.ok ?? 0}</span> /
+			<span class="font-bold text-yellow-500">{stats.meh ?? 0}</span> /
+			<span class="font-bold text-red-500">{stats.miss ?? 0}</span>
 		</p>
 	</div>
 	<div class="flex flex-col gap-2">

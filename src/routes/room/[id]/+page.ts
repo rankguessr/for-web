@@ -1,9 +1,11 @@
-import { client } from '$lib/client';
+import { newApiClient } from '$lib/client';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, fetch }) => {
+	const client = newApiClient(fetch);
+
 	try {
-		const room = await client.getRoom(params.id, fetch);
+		const room = await client.getRoom(params.id);
 
 		return {
 			room,

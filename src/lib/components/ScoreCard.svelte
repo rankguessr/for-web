@@ -43,9 +43,9 @@
 			{/if}
 		</div>
 		<p>
-			<span class="font-bold text-green-500">{stats.count_100}</span> /
-			<span class="font-bold text-yellow-500">{stats.count_50}</span> /
-			<span class="font-bold text-red-500">{stats.count_miss}</span>
+			<span class="font-bold text-green-500">{stats.ok ?? 0}</span> /
+			<span class="font-bold text-yellow-500">{stats.meh ?? 0}</span> /
+			<span class="font-bold text-red-500">{stats.miss ?? 0}</span>
 		</p>
 	</div>
 	<div class="flex flex-col gap-2">

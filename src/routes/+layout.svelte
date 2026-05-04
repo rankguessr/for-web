@@ -15,10 +15,10 @@
 
 	let { children, data }: LayoutProps = $props();
 
-	const user = writable(data.user);
+	const user = $derived(data.user);
+	setUserContext(writable(user));
 
 	let loading = $state(false);
-
 	beforeNavigate(() => {
 		loading = true;
 	});
@@ -26,8 +26,6 @@
 	afterNavigate(() => {
 		loading = false;
 	});
-
-	setUserContext(user);
 </script>
 
 <ThemeProvider>
@@ -40,7 +38,7 @@
 						<Spinner type="default" color="primary" />
 					</div>
 				{:else}
-					{#if $user}
+					{#if user}
 						<UpdateModal />
 					{/if}
 

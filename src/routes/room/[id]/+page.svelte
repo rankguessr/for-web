@@ -2,7 +2,7 @@
 	import { client, type Guess, type Player } from '$lib/client';
 	import { Avatar, Badge, Button, Card, Spinner } from 'flowbite-svelte';
 	import type { PageProps } from './$types';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
@@ -11,18 +11,14 @@
 	import { Turnstile } from 'svelte-turnstile';
 	import { toast } from '$lib/toasts';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
+	import RoomCountdown from '$lib/components/RoomCountdown.svelte';
+	import { browser } from '$app/environment';
 
 	let { params, data }: PageProps = $props();
 
 	const sessionId = $derived(params.id);
 
 	const user = getUserContext();
-
-	$effect(() => {
-		if (!user) {
-			goto('/login');
-		}
-	});
 
 	let turnstileToken = $state<string | null>(null);
 	let guessInput = $state<number>(1);
@@ -33,8 +29,8 @@
 	let submitting = $state(false);
 
 	$effect(() => {
-		if (turnstileToken) {
-			console.log('Turnstile token:', turnstileToken);
+		if (!user) {
+			goto('/login');
 		}
 	});
 
@@ -52,6 +48,7 @@
 			});
 			result = { guess: resp.guess, player: resp.player };
 			if ($user) $user = { ...$user, elo: resp.new_elo };
+			invalidate('app:index');
 		} catch (e) {
 			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
 		} finally {
@@ -64,7 +61,7 @@
 		try {
 			const next = await client.getRoomNextScore(sessionId);
 
-			room = { ...next, guess: null };
+			room = { ...next, kind: room!.kind, guess: null };
 			result = null;
 			guessInput = 0;
 
@@ -81,7 +78,7 @@
 	<title>rankguessr - in room {params.id}</title>
 </svelte:head>
 
-<section class="flex min-w-full flex-1 flex-col items-center justify-center gap-6 py-8">
+<section class="flex min-w-full flex-1 flex-col items-center justify-center gap-6 py-4">
 	{#if !room}
 		<Card class="flex w-full flex-col justify-between gap-4 p-4 md:min-h-36 md:min-w-xl md:p-6">
 			<h1 class="flex items-center gap-2 text-lg font-semibold">
@@ -96,12 +93,21 @@
 		<Spinner type="default" color="primary" />
 	{:else}
 		<div class="flex w-full flex-col items-center gap-5 md:w-3xl">
-			<div class="flex w-full flex-col gap-1">
-				<div class="flex items-center gap-2">
-					<Badge color="purple">Room</Badge>
+			<div class="flex w-full justify-between">
+				<div class="flex items-center gap-1">
+					<Badge color="purple">{room.kind === 'v2' ? 'Ranked' : 'Unranked'}</Badge>
 					{#if sessionId}<Badge color="gray">{sessionId}</Badge>{/if}
 				</div>
-				<h1 class="text-3xl font-bold">Guess player rank from replay</h1>
+
+				<RoomCountdown
+					color="primary"
+					closesAt={room.closes_at}
+					onClose={async () => {
+						if (browser) {
+							await goto('/');
+						}
+					}}
+				/>
 			</div>
 
 			<div class="w-full">
@@ -112,8 +118,7 @@
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Download replay</h2>
 					<p class="mb-4 text-gray-400">
-						Download anonymized .osr replay, open it in osu!, then estimate the player's global
-						rank.
+						Download anonymized replay then estimate player's global rank
 					</p>
 
 					<div class="grid grid-cols-3 grid-rows-1 gap-2">

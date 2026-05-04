@@ -1,14 +1,17 @@
-import { client } from '$lib/client';
+import { newApiClient } from '$lib/client';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ parent, fetch }) => {
+export const load: PageLoad = async ({ parent, fetch, depends }) => {
+	depends('app:index');
 	const { user } = await parent();
+	const client = newApiClient(fetch);
+
 	if (user) {
 		try {
-			const resp = await client.getRoomAndLatest(fetch);
-			return resp;
+			const [latest, { room }] = await Promise.all([client.getGuesses(1), client.getCurrentRoom()]);
+
+			return { room, latest };
 		} catch (e) {
-			console.log(e);
 			return {
 				room: null,
 				latest: null

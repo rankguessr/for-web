@@ -1,9 +1,18 @@
 <script lang="ts">
 	import type { Guess, User } from '$lib/client';
-	import { formatNumber, getGuessCoverURL } from '$lib/utils';
-	import { Avatar, Badge } from 'flowbite-svelte';
+	import { formatNumber, getCoverURL, timeSince } from '$lib/utils';
+	import { Avatar, Badge, type BadgeProps } from 'flowbite-svelte';
 
-	let { guess, user }: { guess: Guess; user?: User } = $props();
+	let {
+		guess,
+		user,
+		showTimeSince = false
+	}: { guess: Guess; user?: User; showTimeSince?: boolean } = $props();
+
+	function getBadgeColor(): BadgeProps['color'] {
+		if (guess.kind !== 'v2') return 'gray';
+		return guess.elo > 0 ? 'green' : 'red';
+	}
 </script>
 
 <a
@@ -11,7 +20,7 @@
 	style={`
         background: 
             linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-            url(${getGuessCoverURL(guess)}); 
+            url(${getCoverURL(guess.beatmapset_id, guess.beatmap_id)}); 
         background-size: cover; 
         background-position: center;
     `}
@@ -36,9 +45,15 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex flex-col justify-center">
-		<Badge color={guess.elo > 0 ? 'green' : 'red'} size="small">
+	<div class="flex flex-col items-end justify-between p-2">
+		<Badge color={getBadgeColor()} size="small">
 			{guess.elo}
 		</Badge>
+
+		{#if showTimeSince}
+			<p class="text-xs text-gray-400">
+				{timeSince(new Date(guess.created_at))}
+			</p>
+		{/if}
 	</div>
 </a>

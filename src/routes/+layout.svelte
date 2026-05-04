@@ -8,6 +8,7 @@
 	import { writable } from 'svelte/store';
 	import UpdateModal from '$lib/components/UpdateModal.svelte';
 	import ToastsProvider from '$lib/components/ToastsProvider.svelte';
+	import { env } from '$env/dynamic/public';
 
 	let { children, data }: LayoutProps = $props();
 
@@ -23,6 +24,16 @@
 		loading = false;
 	});
 </script>
+
+<svelte:head>
+	{#if env.PUBLIC_UMAMI !== '0'}
+		<script
+			defer
+			src={env.PUBLIC_UMAMI_SCRIPT_URL}
+			data-website-id={env.PUBLIC_UMAMI_WEBSITE_ID}
+		></script>
+	{/if}
+</svelte:head>
 
 <ThemeProvider>
 	<main class="flex min-h-screen w-full flex-col dark bg-gray-900 text-white">

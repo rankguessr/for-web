@@ -75,6 +75,7 @@ export type RoomInfo = {
 	score: Score;
 	guess: Guess | null;
 	kind: RoomKind;
+	comment: string | null;
 	closes_at: Date;
 };
 
@@ -82,6 +83,7 @@ export type RoomNextResp = {
 	score: Score;
 	refill: RefillResult;
 	closes_at: Date;
+	comment: string | null;
 };
 
 export type Room = {

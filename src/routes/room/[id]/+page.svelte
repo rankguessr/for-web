@@ -113,6 +113,15 @@
 				<ScoreCard score={room.score} shouldPlayPreview={false} />
 			</div>
 
+			{#if room.kind === 'v2sub' && !!room.comment}
+				<Card class="min-w-full p-4 py-6">
+					<p>
+						<span class="font-semibold">Player's comment: </span>
+						{room.comment}
+					</p>
+				</Card>
+			{/if}
+
 			{#if !result && !room.guess}
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Download replay</h2>

@@ -17,11 +17,12 @@ COPY . .
 ENV NODE_ENV=production
 RUN bun run build
 
-FROM base AS release
+FROM oven/bun:alpine AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/build build
 COPY --from=prerelease /usr/src/app/package.json .
 
 USER bun
+
 EXPOSE 3000/tcp
 ENTRYPOINT [ "bun", "run", "build/index.js" ]

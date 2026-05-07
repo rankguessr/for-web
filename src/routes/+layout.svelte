@@ -13,7 +13,12 @@
 	let { children, data }: LayoutProps = $props();
 
 	const user = $derived(data.user);
-	setUserContext(writable(user));
+	const userStore = writable(user);
+	setUserContext(userStore);
+
+	$effect(() => {
+		userStore.set(user);
+	});
 
 	let loading = $state(false);
 	beforeNavigate(() => {
@@ -35,7 +40,7 @@
 	{/if}
 </svelte:head>
 
-<main class="flex min-h-screen w-full flex-col bg-gray-900 text-white">
+<main class="flex min-h-screen w-full flex-col bg-base-100">
 	<div class="mx-auto flex min-h-screen w-full flex-col">
 		<Navbar />
 		<div class="flex w-full flex-1 flex-col px-4">

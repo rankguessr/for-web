@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { Avatar, Card } from 'flowbite-svelte';
+	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
 	import GuessRow from '$lib/components/GuessRow.svelte';
+	import Avatar from '$lib/components/ui/Avatar.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
 	import { formatNumber } from '$lib/utils';
 	import { TrophyIcon } from '@lucide/svelte';
 
@@ -28,15 +30,17 @@
 {#if stats}
 	{@const { best, top_users } = stats}
 
-	<section class="flex max-w-full flex-1 items-center justify-center">
-		<div class="flex w-2xl flex-col gap-4 sm:flex-row sm:justify-center md:w-4xl">
-			<Card class="flex w-full p-3" size="xl">
-				<div class="mb-4 flex w-full items-center gap-2">
+	<section class="flex max-w-full flex-1 justify-center py-4">
+		<div class="flex w-2xl flex-col gap-4 sm:flex-row sm:justify-center md:w-5xl">
+			<Card class="flex w-full flex-col gap-3 p-3 py-4">
+				<div class="flex w-full items-center gap-2">
 					<TrophyIcon class="h-5 w-5" />
 					<h2 class="text-2xl font-semibold">Best guessers</h2>
 				</div>
 
-				<div class="flex w-full flex-col gap-4">
+				<div
+					class="flex h-full w-full flex-col gap-3 py-4 md:items-center md:justify-between md:gap-0"
+				>
 					{#each top_users as user (user.osu_id)}
 						<a
 							href={`https://osu.ppy.sh/users/${user.osu_id}`}
@@ -48,7 +52,7 @@
 								<p class={`min-w-7 text-lg font-semibold ${getRankColor(user.rank)}`}>
 									#{formatNumber(user.rank)}
 								</p>
-								<Avatar size="md" src={user?.avatar_url} alt="User avatar" />
+								<Avatar src={user?.avatar_url} alt="User avatar" />
 
 								<div class="flex items-center justify-center gap-2 rounded-md">
 									<p class="text-lg">{user.username}</p>
@@ -68,30 +72,22 @@
 
 			<div class="flex w-full flex-col gap-4 sm:w-full md:w-full">
 				<div class="flex gap-2">
-					<Card class="p-2">
+					<Card class="w-full p-2">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses today</p>
 						<div class="mt-2 text-4xl font-bold">{formatNumber(stats.count_24h)}</div>
 					</Card>
-					<Card class="p-2">
+					<Card class="w-full p-2">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses total</p>
 						<div class="mt-2 text-4xl font-bold">{formatNumber(stats.count_global)}</div>
 					</Card>
 				</div>
 
-				<Card class="h-full p-3" size="xl">
+				<Card class="h-full p-3">
 					<div class="mb-4 items-center gap-2">
 						<h2 class="text-xl font-semibold">Best guesses (24h)</h2>
 					</div>
 
-					<div class="flex w-full flex-1 flex-col gap-2">
-						{#if best.length > 0}
-							{#each best.slice(0, 5) as item}
-								<GuessRow guess={item} user={item.user} showTimeSince={true} />
-							{/each}
-						{:else}
-							<div class="font-semibold">No guesses available.</div>
-						{/if}
-					</div>
+					<GuessesColumn guesses={best} cap={5} showTimeSince={true} />
 				</Card>
 			</div>
 		</div>

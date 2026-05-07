@@ -86,6 +86,10 @@ export type RoomNextResp = {
 	comment: string | null;
 };
 
+export type PrepareReplayResp = {
+	url: string;
+};
+
 export type Room = {
 	id: string;
 	score: Score;
@@ -223,6 +227,10 @@ export class ApiClient {
 
 	adminDeleteSubmission(submissionId: string): Promise<void> {
 		return this._delete(`/submissions/${submissionId}`);
+	}
+
+	prepareReplay(roomId: string): Promise<PrepareReplayResp> {
+		return this._post(`/room/${roomId}/prepare`, {});
 	}
 
 	submitScore(data: { score_url: string; comment: string }): Promise<Submission> {

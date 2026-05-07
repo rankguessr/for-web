@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Modal, P } from 'flowbite-svelte';
+	// import { Button, Modal, P } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 
 	const CURRENT_UPDATE = '20260412';
@@ -19,7 +19,7 @@
 		defaultModal = false;
 	}
 </script>
-
+<!-- 
 <Modal
 	title="New update"
 	form
@@ -40,4 +40,4 @@
 	{#snippet footer()}
 		<Button type="submit" color="alternative">Close</Button>
 	{/snippet}
-</Modal>
+</Modal> -->

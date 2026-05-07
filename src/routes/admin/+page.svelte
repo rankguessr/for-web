@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { client, type SubmissionExtended } from '$lib/client/index.js';
+	import Avatar from '$lib/components/ui/Avatar.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Pagination from '$lib/components/ui/Pagination.svelte';
+	import Spinner from '$lib/components/ui/Spinner.svelte';
 	import { toast } from '$lib/toasts/index.js';
 	import { getCoverURL, timeSince } from '$lib/utils/index.js';
-	import { Avatar, Button, Card, PaginationNav, Spinner, Toggle } from 'flowbite-svelte';
 
 	let currentPage = $state(1);
 	let loading = $state(true);
@@ -56,7 +60,7 @@
 		<div class="flex w-full items-center justify-between">
 			<div class="flex items-center gap-2">
 				<h2 class="text-xl font-semibold">Last submissions</h2>
-				<Toggle bind:checked={showAccepted}>Accepted</Toggle>
+				<!-- <Toggle bind:checked={showAccepted}>Accepted</Toggle> -->
 			</div>
 		</div>
 
@@ -79,7 +83,7 @@
 				>
 					<div class="flex flex-col justify-between">
 						<div class="flex items-center gap-2">
-							<Avatar size="sm" src={user.avatar_url} alt="User avatar" />
+							<Avatar src={user.avatar_url} alt="User avatar" />
 							<p class="text-right text-sm font-semibold">{user.username}</p>
 						</div>
 						<p>
@@ -93,10 +97,10 @@
 
 						{#if !submission.is_accepted}
 							<div class="flex gap-1">
-								<Button color="green" size="xs" onclick={() => acceptSubmission(submission.id)}
+								<Button color="success" onclick={() => acceptSubmission(submission.id)}
 									>Accept</Button
 								>
-								<Button color="red" size="xs" onclick={() => deleteSubmission(submission.id)}>
+								<Button color="error" onclick={() => deleteSubmission(submission.id)}>
 									Delete
 								</Button>
 							</div>
@@ -106,12 +110,11 @@
 			{/each}
 		{/if}
 		{#if submissions}
-			<PaginationNav
+			<Pagination
 				{onPageChange}
 				{currentPage}
 				totalPages={10}
-				previousLabel="Prev"
-				size="large"
+				size="lg"
 			/>
 		{/if}
 	</Card>

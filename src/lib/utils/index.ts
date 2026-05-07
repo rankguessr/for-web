@@ -1,9 +1,12 @@
-import type { Guess } from '$lib/client';
-
 const numFormat = new Intl.NumberFormat();
 
 export const getCoverURL = (beatmapset_id: number, beatmap_id: number): string => {
 	return `https://assets.ppy.sh/beatmaps/${beatmapset_id}/covers/slimcover.jpg?${beatmap_id}`;
+};
+
+export const validateScoreURL = (url: string): boolean => {
+	const pattern = /^https:\/\/osu\.ppy\.sh\/scores\/\d+$/;
+	return pattern.test(url);
 };
 
 export const formatNumber = (num: number): string => {

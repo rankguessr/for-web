@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Badge, type BadgeProps } from 'flowbite-svelte';
+	import type { UIColors } from './ui';
+	import Badge from './ui/Badge.svelte';
 
 	let {
 		closesAt,
 		onClose,
-		color = 'gray'
-	}: { closesAt: Date; onClose?: () => void; color?: BadgeProps['color'] } = $props();
+		color = 'warning'
+	}: { closesAt: Date; onClose?: () => void; color?: UIColors } = $props();
 
 	let closesIn = $state<number>(getClosesIn());
 
@@ -35,4 +36,4 @@
 	}
 </script>
 
-<Badge {color}>{formatMillis(closesIn)}</Badge>
+<Badge {color} size="sm" soft>{formatMillis(closesIn)}</Badge>

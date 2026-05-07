@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Score } from '$lib/client';
-	import { Badge } from 'flowbite-svelte';
 	import PlayButton from './PlayButton.svelte';
 	import RoomCountdown from './RoomCountdown.svelte';
+	import Badge from './ui/Badge.svelte';
 
 	let {
 		score,
@@ -19,7 +19,9 @@
 		closesAt?: Date;
 		onClose?: () => void;
 	} = $props();
+
 	let stats = $derived(score.statistics);
+	const mods = $derived(score.mods.filter((mod) => mod.toLowerCase() !== 'cl'));
 </script>
 
 <div
@@ -54,19 +56,19 @@
 		</p>
 		<div class="mt-3 flex justify-between">
 			<div class="flex gap-1">
-				<Badge color="blue">{Math.round(score.pp)}pp</Badge>
-				<Badge color="cyan">{(score.accuracy * 100).toFixed(2)}%</Badge>
+				<Badge color="neutral" soft>{Math.round(score.pp)}pp</Badge>
+				<Badge color="neutral" soft>{(score.accuracy * 100).toFixed(2)}%</Badge>
 				{#if score.beatmap?.difficulty_rating}
-					<Badge color="purple">★ {score.beatmap.difficulty_rating.toFixed(2)}</Badge>
+					<Badge color="neutral" soft>★ {score.beatmap.difficulty_rating.toFixed(2)}</Badge>
 				{/if}
 			</div>
 			<div class="flex gap-0.5">
-				{#if score.mods.length > 0}
-					{#each score.mods as mod}
-						<Badge color="yellow">{mod}</Badge>
+				{#if mods.length > 0}
+					{#each mods as mod}
+						<Badge color="warning" soft>{mod}</Badge>
 					{/each}
 				{:else}
-					<Badge color="gray">NM</Badge>
+					<Badge color="neutral" size="sm" soft>NM</Badge>
 				{/if}
 			</div>
 		</div>

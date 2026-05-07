@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toast, toasts } from '$lib/toasts';
 	import { CircleAlert, CircleCheck } from '@lucide/svelte';
-	import { Toast, ToastContainer } from 'flowbite-svelte';
 	import { onDestroy } from 'svelte';
 	import { fly } from 'svelte/transition';
 
@@ -10,7 +9,7 @@
 	});
 </script>
 
-<ToastContainer position="bottom-right">
+<!-- <ToastContainer position="bottom-right">
 	{#each $toasts as t (t.id)}
 		<Toast
 			color={t.type === 'success' ? 'green' : 'red'}
@@ -34,4 +33,4 @@
 			{t.message}
 		</Toast>
 	{/each}
-</ToastContainer>
+</ToastContainer> -->

@@ -38,7 +38,7 @@ export const add = (message: string, type: ToastType = 'success') => {
 		const toast = { id: genId(), visible: true, message, type };
 		const timeoutId = setTimeout(() => {
 			dismiss(toast.id);
-		}, 5000);
+		}, TOAST_DISMISS_TIMEOUT);
 		timeoutIds.set(toast.id, timeoutId);
 
 		return [...currentToasts, toast].slice(0, TOAST_LIMIT);

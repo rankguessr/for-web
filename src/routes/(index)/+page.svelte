@@ -92,34 +92,29 @@
 		try {
 			validateReplay();
 			submitModal = false;
-			setTimeout(() => {
-				hasReplay = true;
-			}, 200);
+			hasReplay = true;
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Unknown error');
 		}
 	}
 
-	function onSubmitAction(e: SubmitEvent): boolean {
+	async function onSubmitAction(e: SubmitEvent) {
 		const data = new FormData(e.target as HTMLFormElement);
 		const score_url = data.get('score_url') as string;
 		const comment = data.get('comment') as string;
 
 		if (!score_url) {
 			toast.error('Score URL is required');
-			return false;
+			return;
 		}
 
-		client
-			.submitScore({ score_url, comment })
-			.then(() => {
-				toast.success('Score submitted successfully');
-			})
-			.catch((e) => {
-				toast.error(`Failed to submit a score: ${e.message || 'unknown error'}`);
-			});
+		try {
+			await client.submitScore({ score_url, comment });
 
-		return true;
+			toast.success('Score submitted successfully');
+		} catch (e) {
+			toast.error(`Failed to submit a score: ${e instanceof Error ? e.message : 'Unknown error'}`);
+		}
 	}
 
 	async function createRoom(kind: RoomKind) {
@@ -129,7 +124,7 @@
 			if ($user) $user = { ...$user, ...refill };
 			if (room_id && room_id !== '') await goto(`/room/${room_id}`);
 		} catch (e) {
-			toast.error('Failed to create room');
+			toast.error(`Failed to create room: ${e instanceof Error ? e.message : 'Unknown error'}`);
 		} finally {
 			roomLoading = false;
 		}

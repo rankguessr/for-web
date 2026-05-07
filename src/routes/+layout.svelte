@@ -6,9 +6,11 @@
 	import { setUserContext } from '$lib/context';
 	import { writable } from 'svelte/store';
 	import UpdateModal from '$lib/components/UpdateModal.svelte';
-	import ToastsProvider from '$lib/components/ToastsProvider.svelte';
+	import ToastsProvider from '$lib/components/ToastProvider.svelte';
 	import { env } from '$env/dynamic/public';
 	import Spinner from '$lib/components/ui/Spinner.svelte';
+	import { onDestroy } from 'svelte';
+	import { toast } from '$lib/toasts';
 
 	let { children, data }: LayoutProps = $props();
 
@@ -27,6 +29,10 @@
 
 	afterNavigate(() => {
 		loading = false;
+	});
+
+	onDestroy(() => {
+		toast.clearTimeouts();
 	});
 </script>
 

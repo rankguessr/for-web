@@ -1,9 +1,14 @@
 import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { analyzer } from 'vite-bundle-analyzer';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit()],
+	plugins: [
+		tailwindcss(),
+		sveltekit(),
+		analyzer({ analyzerMode: 'static', openAnalyzer: true, enabled: !!process.env.ANALYZE })
+	],
 	server: {
 		proxy: {
 			'/api': {

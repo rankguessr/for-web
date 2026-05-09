@@ -1,58 +1,94 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
-	import { getUserContext } from '$lib/context';
 	import { formatNumber } from '$lib/utils';
-	import { ChevronDown, LogOut } from '@lucide/svelte';
-	import {
-		Avatar,
-		Button,
-		Dropdown,
-		Navbar,
-		NavBrand,
-		NavHamburger,
-		NavLi,
-		NavUl
-	} from 'flowbite-svelte';
+	import Avatar from './ui/Avatar.svelte';
+	import { getUserContext } from '$lib/context';
+	import { resolve } from '$app/paths';
+	import ThemeController from './ThemeController.svelte';
 
 	const user = getUserContext();
 </script>
 
-<Navbar class="px-3 py-1 sm:px-4 dark:border-gray-700" breakpoint="md">
-	<NavHamburger />
-	<NavBrand href="/">
-		<span class="self-center text-xl font-semibold whitespace-nowrap">rankguessr</span>
-	</NavBrand>
-
-	<NavUl>
-		<NavLi href="/stats">statistics</NavLi>
-		<NavLi href={env.PUBLIC_DISCORD_URL} target="_blank">discord</NavLi>
-		{#if $user?.is_admin}
-			<NavLi href="/admin">admin</NavLi>
-		{/if}
-
-		<NavLi class="cursor-pointer">
-			misc<ChevronDown class="ms-1 inline h-6 w-6 text-primary-800 dark:text-gray-400" />
-		</NavLi>
-		<Dropdown simple class="w-44">
-			<NavLi href={env.PUBLIC_DONATION_URL} target="_blank">support me</NavLi>
-			<NavLi href={env.PUBLIC_GITHUB_URL} target="_blank">source code</NavLi>
-		</Dropdown>
-	</NavUl>
-
-	<div class="flex items-center gap-3 md:order-2">
-		{#if $user}
-			<div class="hidden text-right sm:block">
-				<p class="text-xs font-medium sm:text-sm">{$user.username}</p>
-				<p class="text-xs font-semibold">({formatNumber($user.elo)} elo)</p>
+<div class="navbar bg-base-200 shadow-sm">
+	<div class="navbar-start">
+		<div class="dropdown">
+			<div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4 6h16M4 12h8m-8 6h16"
+					/>
+				</svg>
 			</div>
-			<Avatar src={$user.avatar_url} alt={$user.username} class="h-8 w-8" />
-			<a href={`${env.PUBLIC_API_URL}/auth/logout`}>
-				<LogOut size={20} />
-			</a>
-		{:else}
-			<Button href={`${env.PUBLIC_API_URL}/auth/login`} size="sm" color="primary"
-				>Login with osu!</Button
+			<ul
+				tabindex="-1"
+				class="dropdown-content menu z-1 mt-3 w-52 menu-md rounded-box bg-base-100 p-2 shadow"
 			>
-		{/if}
+				<li><a href={resolve('/stats')}>statistics</a></li>
+				<li><a href={resolve('/discord')} target="_blank">discord</a></li>
+				{#if $user?.is_admin}
+					<li><a href={resolve('/admin')}>admin</a></li>
+				{/if}
+				<li>
+					<button>misc</button>
+					<ul>
+						<li><a href={resolve('/github')} target="_blank">source code</a></li>
+						<li><a href={resolve('/donate')} target="_blank">support development</a></li>
+					</ul>
+				</li>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<li><a href={`${env.PUBLIC_API_URL}/auth/logout`}>logout</a></li>
+			</ul>
+		</div>
+		<a href={resolve('/')} class="btn text-xl text-accent btn-ghost">rankguessr</a>
 	</div>
-</Navbar>
+
+	<div class="navbar-center hidden lg:flex">
+		<ul class="menu menu-horizontal px-1">
+			<li><a href={resolve('/stats')}>statistics</a></li>
+			<li><a href={resolve('/discord')} target="_blank">discord</a></li>
+			{#if $user?.is_admin}
+				<li><a href={resolve('/admin')}>admin</a></li>
+			{/if}
+			<li>
+				<details>
+					<summary>misc</summary>
+					<ul class="z-1 w-40 bg-base-100 p-2">
+						<li><a href={resolve('/donate')} target="_blank">support development</a></li>
+						<li><a href={resolve('/github')} target="_blank">source code</a></li>
+					</ul>
+				</details>
+			</li>
+		</ul>
+	</div>
+	<div class="navbar-end">
+		<div class="flex items-center gap-3 md:order-2">
+			{#if $user}
+				<div class="hidden text-right sm:block">
+					<p class="text-xs font-medium sm:text-sm">{$user.username}</p>
+					<p class="text-xs font-semibold">({formatNumber($user.elo)} elo)</p>
+				</div>
+				<div class="dropdown dropdown-end">
+					<Avatar src={$user.avatar_url} alt={$user.username} asButton />
+					<ul
+						tabindex="-1"
+						class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-100 p-2 shadow"
+					>
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+						<li><a href={`${env.PUBLIC_API_URL}/auth/logout`}>Logout</a></li>
+					</ul>
+				</div>
+
+				<ThemeController />
+			{/if}
+		</div>
+	</div>
+</div>

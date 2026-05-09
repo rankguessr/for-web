@@ -1,4 +1,4 @@
-import type { Room, User } from '$lib/client';
+import type { User } from '$lib/client';
 import { createContext } from 'svelte';
 import type { Writable } from 'svelte/store';
 

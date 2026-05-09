@@ -17,7 +17,7 @@ export class ServerError extends Error {
 	}
 }
 
-export type PagedResult<T> = {
+export type Paged<T> = {
 	items: T[];
 	pages_total: number;
 };
@@ -86,6 +86,10 @@ export type RoomNextResp = {
 	comment: string | null;
 };
 
+export type PrepareReplayResp = {
+	url: string;
+};
+
 export type Room = {
 	id: string;
 	score: Score;
@@ -111,7 +115,7 @@ export type PublicStats = {
 	count_24h: number;
 	count_global: number;
 	best: GuessExtended[];
-	top_users: UserExtended[];
+	top_users: Paged<UserExtended>;
 };
 
 export type Guess = {
@@ -152,6 +156,13 @@ export type GuessRequest = {
 	token: string;
 };
 
+type SubMeta = {
+	comment: string;
+	is_anonymous: boolean;
+};
+
+export type SubmitScoreReq = (SubMeta & { score_url: string }) | (SubMeta & { score_file: File });
+
 export type Fetch = typeof fetch;
 
 export class ApiClient {
@@ -182,13 +193,21 @@ export class ApiClient {
 		return this._makeRequest(path, { credentials: 'include' });
 	}
 
-	private async _post<T>(path: string, body: any): Promise<T> {
+	private async _post<T>(path: string, body: unknown): Promise<T> {
 		return this._makeRequest(path, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(body),
+			credentials: 'include'
+		});
+	}
+
+	private async _postForm<T>(path: string, formData: FormData): Promise<T> {
+		return this._makeRequest(path, {
+			method: 'POST',
+			body: formData,
 			credentials: 'include'
 		});
 	}
@@ -225,12 +244,42 @@ export class ApiClient {
 		return this._delete(`/submissions/${submissionId}`);
 	}
 
-	submitScore(data: { score_url: string; comment: string }): Promise<Submission> {
-		return this._post('/submissions', data);
+	prepareReplay(roomId: string): Promise<PrepareReplayResp> {
+		return this._post(`/room/${roomId}/prepare`, {});
+	}
+
+	async submitScore(data: SubmitScoreReq): Promise<Submission> {
+		const formData = new FormData();
+		formData.append('comment', data.comment);
+		formData.append('is_anonymous', data.is_anonymous.toString());
+
+		if ('score_url' in data) {
+			console.log('setting score_url');
+			formData.append('score_url', data.score_url);
+		} else {
+			console.log('setting score_file');
+			formData.append('score_file', data.score_file);
+		}
+
+		return this._postForm('/submissions', formData);
 	}
 
 	getPublicStats(): Promise<PublicStats> {
 		return this._get('/stats');
+	}
+
+	getPublicTopUsers({
+		page = 1,
+		limit = 10
+	}: {
+		page?: number;
+		limit?: number;
+	}): Promise<Paged<UserExtended>> {
+		const params = new URLSearchParams();
+		params.set('page', page.toString());
+		params.set('limit', limit.toString());
+
+		return this._get('/stats/top-users?' + params.toString());
 	}
 
 	getCurrentRoom(): Promise<{ room: Room | null }> {
@@ -260,7 +309,7 @@ export class ApiClient {
 		return this._get('/user/me');
 	}
 
-	getGuesses(page: number = 1): Promise<PagedResult<Guess>> {
+	getGuesses(page: number = 1): Promise<Paged<Guess>> {
 		const params = new URLSearchParams();
 		params.set('page', page.toString());
 		params.set('limit', '6');

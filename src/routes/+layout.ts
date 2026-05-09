@@ -6,8 +6,8 @@ export const load: LayoutLoad = async ({ fetch }) => {
 
 	try {
 		const { user } = await client.getMe();
-		return { user };
-	} catch (e) {
-		return { user: null };
+		return { user, error: null };
+	} catch (e: unknown) {
+		return { user: null, error: e instanceof Error ? e.message : 'An unknown error occurred' };
 	}
 };

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { client, type Guess, type Player } from '$lib/client';
-	import { Avatar, Badge, Button, Card, Spinner } from 'flowbite-svelte';
 	import type { PageProps } from './$types';
 	import { goto, invalidate } from '$app/navigation';
 	import ActualRank from '$lib/components/ActualRank.svelte';
@@ -12,6 +11,13 @@
 	import { toast } from '$lib/toasts';
 	import RoomCountdown from '$lib/components/RoomCountdown.svelte';
 	import { browser } from '$app/environment';
+	import Card from '$lib/components/ui/Card.svelte';
+	import Spinner from '$lib/components/ui/Spinner.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Avatar from '$lib/components/ui/Avatar.svelte';
+	import { resolve } from '$app/paths';
+	import Input from '$lib/components/ui/Input.svelte';
 
 	let { params, data }: PageProps = $props();
 
@@ -22,16 +28,26 @@
 	let turnstileToken = $state<string | null>(null);
 	let guessInput = $state<number>(1);
 	let result = $state<{ guess: Guess; player: Player } | null>(null);
-	let loadingNext = $state(false);
 	let room = $derived(data.room);
 
-	let submitting = $state(false);
+	let nextLoading = $state(false);
+	let submitLoading = $state(false);
+	let josuLoading = $state(false);
+
+	const josuSupportedMods = ['hd', 'hr', 'dt', 'ez', 'nc', 'nf', 'cl'];
+	const josuAvailable = $derived(
+		env.PUBLIC_JOSU_URL !== undefined && !!room && isJosuSupportedMods(room.score.mods)
+	);
 
 	$effect(() => {
-		if (!user) {
-			goto('/login');
+		if (!$user) {
+			goto(resolve('/'));
 		}
 	});
+
+	function isJosuSupportedMods(mods: string[]) {
+		return mods.every((mod) => josuSupportedMods.includes(mod.toLowerCase()));
+	}
 
 	async function submitGuess() {
 		if (!turnstileToken) {
@@ -39,7 +55,7 @@
 			return;
 		}
 
-		submitting = true;
+		submitLoading = true;
 		try {
 			const resp = await client.submitGuess(sessionId, {
 				guess: guessInput,
@@ -48,15 +64,15 @@
 			result = { guess: resp.guess, player: resp.player };
 			if ($user) $user = { ...$user, elo: resp.new_elo };
 			invalidate('app:index');
-		} catch (e) {
-			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
+		} catch (err: unknown) {
+			toast.error('Failed to submit guess', err);
 		} finally {
-			submitting = false;
+			submitLoading = false;
 		}
 	}
 
 	async function getNextScore() {
-		loadingNext = true;
+		nextLoading = true;
 		try {
 			const next = await client.getRoomNextScore(sessionId);
 
@@ -65,10 +81,26 @@
 			guessInput = 0;
 
 			if ($user) $user = { ...$user, ...next.refill };
-		} catch (e) {
-			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
+		} catch (err: unknown) {
+			toast.error('Failed to get next score', err);
 		} finally {
-			loadingNext = false;
+			nextLoading = false;
+		}
+	}
+
+	async function openInJosu() {
+		josuLoading = true;
+		try {
+			const resp = await client.prepareReplay(params.id);
+			if (env.PUBLIC_JOSU_URL) {
+				const url = new URL(env.PUBLIC_JOSU_URL);
+				url.searchParams.set('r', resp.url);
+				window.open(url, '_blank')?.focus();
+			}
+		} catch (err: unknown) {
+			toast.error('Failed to open in JoSu', err);
+		} finally {
+			josuLoading = false;
 		}
 	}
 </script>
@@ -88,14 +120,13 @@
 				discord: <span class="font-semibold">@harvywtf</span>
 			</p>
 		</Card>
-	{:else if loadingNext}
-		<Spinner type="default" color="primary" />
+	{:else if nextLoading}
+		<Spinner size="lg" />
 	{:else}
-		<div class="flex w-full flex-col items-center gap-5 md:w-3xl">
+		<div class="flex w-full flex-col items-center gap-3 md:w-175">
 			<div class="flex w-full justify-between">
 				<div class="flex items-center gap-1">
-					<Badge color="purple">{room.kind === 'v2' ? 'Ranked' : 'Unranked'}</Badge>
-					{#if sessionId}<Badge color="gray">{sessionId}</Badge>{/if}
+					<Badge color="warning" soft>{room.kind === 'v2' ? 'Ranked' : 'Unranked'}</Badge>
 				</div>
 
 				<RoomCountdown
@@ -103,13 +134,13 @@
 					closesAt={room.closes_at}
 					onClose={async () => {
 						if (browser) {
-							await goto('/');
+							await goto(resolve('/'));
 						}
 					}}
 				/>
 			</div>
 
-			<div class="w-full">
+			<div class="h-34 w-full">
 				<ScoreCard score={room.score} shouldPlayPreview={false} />
 			</div>
 
@@ -129,50 +160,54 @@
 						Download anonymized replay then estimate player's global rank
 					</p>
 
-					<div class="grid grid-cols-3 grid-rows-1 gap-2">
-						<Button
-							href={`${env.PUBLIC_API_URL}/room/replay/${params.id}.osr`}
-							download
-							target="_blank"
-							color="primary"
-							class="col-span-2"
-						>
-							Download .osr replay
-						</Button>
-						<Button
-							href={`https://osu.ppy.sh/beatmapsets/${room.score.beatmap.beatmapset_id}`}
-							download
-							target="_blank"
-							color="gray"
-							class="col-span-1"
-						>
-							Download beatmap
-						</Button>
+					<div class="flex w-full flex-1 flex-col gap-2">
+						{#if josuAvailable}
+							<Button target="_blank" color="accent" disabled={josuLoading} onclick={openInJosu}>
+								{josuLoading ? 'Downloading replay...' : 'Watch using JoSu'}
+							</Button>
+						{/if}
+						<div class="grid grid-cols-2 gap-1">
+							<Button
+								href={`${env.PUBLIC_API_URL}/room/replay/${params.id}.osr`}
+								download
+								disabled={josuLoading}
+								target="_blank"
+								color={josuAvailable ? 'secondary' : 'accent'}
+							>
+								Download replay
+							</Button>
+							<Button
+								href={`https://osu.ppy.sh/beatmapsets/${room.score.beatmap.beatmapset_id}`}
+								target="_blank"
+								color="secondary"
+								disabled={josuLoading}
+							>
+								Download beatmap
+							</Button>
+						</div>
 					</div>
 				</Card>
 
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Submit guess</h2>
-					<label for="guess-rank-input" class="mb-2 block text-sm font-medium text-gray-400"
-						>Global rank guess (less than 3mil)</label
-					>
-					<input
+					<Input
+						label=""
 						id="guess-rank-input"
 						type="number"
 						min="1"
 						max="3000000"
 						bind:value={guessInput}
 						placeholder="e.g. 1250"
-						class="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500"
+						class="w-full"
 					/>
 
 					<Button
 						class="mt-4 w-full"
-						color="green"
+						color="secondary"
 						onclick={submitGuess}
-						disabled={!guessInput || submitting || !!room.guess}
+						disabled={!guessInput || submitLoading || !!room.guess}
 					>
-						{submitting ? 'Submitting...' : 'Submit guess'}
+						{submitLoading ? 'Submitting...' : 'Submit guess'}
 					</Button>
 
 					<Turnstile
@@ -180,6 +215,7 @@
 						theme="dark"
 						class="mt-4 w-full"
 						size="flexible"
+						appearance="interaction-only"
 						on:callback={(event) => (turnstileToken = event.detail.token)}
 						on:error={(event) => {
 							toast.error('Turnstile error: ' + event.detail.code);
@@ -216,10 +252,9 @@
 					<Card class="min-w-full p-4">
 						<div class="flex items-center gap-4">
 							<Avatar
-								size="md"
 								src={player?.avatar_url}
 								alt="Player avatar"
-								dot={{ placement: 'bottom-right', color: player?.is_online ? 'green' : 'gray' }}
+								// dot={{ placement: 'bottom-right', color: player?.is_online ? 'green' : 'gray' }}
 							/>
 
 							<div class="flex items-center justify-center gap-2 rounded-md">
@@ -234,9 +269,9 @@
 					</Card>
 				</a>
 
-				<div class="flex">
-					<Button color="primary" onclick={getNextScore}>Play again</Button>
-					<Button class="ml-2" color="gray" onclick={() => goto('/')}>Return home</Button>
+				<div class="flex min-w-full flex-col gap-2">
+					<Button color="accent" onclick={getNextScore}>Play again</Button>
+					<Button color="secondary" href="/">Return home</Button>
 				</div>
 			{/if}
 		</div>

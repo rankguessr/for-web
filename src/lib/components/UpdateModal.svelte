@@ -1,25 +1,26 @@
 <script lang="ts">
-	import { Button, Modal, P } from 'flowbite-svelte';
-	import { onMount } from 'svelte';
+	// // import { Button, Modal, P } from 'flowbite-svelte';
+	// import { onMount } from 'svelte';
 
-	const CURRENT_UPDATE = '20260412';
-	const LAST_UPDATE_KEY = 'last_update';
+	// const CURRENT_UPDATE = '20260412';
+	// const LAST_UPDATE_KEY = 'last_update';
 
-	let defaultModal = $state(false);
+	// let defaultModal = $state(false);
 
-	onMount(() => {
-		const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
-		if (lastUpdate !== CURRENT_UPDATE) {
-			defaultModal = true;
-		}
-	});
+	// onMount(() => {
+	// 	const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
+	// 	if (lastUpdate !== CURRENT_UPDATE) {
+	// 		defaultModal = true;
+	// 	}
+	// });
 
-	function handleClose() {
-		localStorage.setItem(LAST_UPDATE_KEY, CURRENT_UPDATE);
-		defaultModal = false;
-	}
+	// function handleClose() {
+	// 	localStorage.setItem(LAST_UPDATE_KEY, CURRENT_UPDATE);
+	// 	defaultModal = false;
+	// }
 </script>
 
+<!-- 
 <Modal
 	title="New update"
 	form
@@ -40,4 +41,4 @@
 	{#snippet footer()}
 		<Button type="submit" color="alternative">Close</Button>
 	{/snippet}
-</Modal>
+</Modal> -->

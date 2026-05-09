@@ -5,6 +5,7 @@
 }
 
 @plugin './mocha.ts';
+@plugin './latte.ts';
 
 /* rubik-regular - latin */
 @font-face {

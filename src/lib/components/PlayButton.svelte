@@ -29,7 +29,7 @@
 	});
 </script>
 
-<button class="cursor-pointer" onclick={() => (isPlaying = !isPlaying)}>
+<button class="cursor-pointer text-white" onclick={() => (isPlaying = !isPlaying)}>
 	{#if isPlaying}
 		<Pause width={14} />
 	{:else}

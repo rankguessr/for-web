@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CheckboxProps, InputProps, UIColors, UISizes } from '.';
+	import type { CheckboxProps, UIColors, UISizes } from '.';
 
 	let {
 		label,

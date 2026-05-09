@@ -5,7 +5,7 @@
 		currentPage = $bindable(),
 		totalPages,
 		visiblePages = 5,
-		size = 'md',
+		// size = 'md',
 		onPageChange
 	}: PaginationProps = $props();
 
@@ -52,7 +52,7 @@
 		disabled: currentPage <= 1,
 		onclick: () => onPageChange(currentPage - 1)
 	})}
-	{#each pageNumbers as page}
+	{#each pageNumbers as page (page)}
 		{@render pageButton({
 			text: page.toString(),
 			active: page === currentPage,

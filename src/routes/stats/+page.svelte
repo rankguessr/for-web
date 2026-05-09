@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { client } from '$lib/client';
 	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
-	import GuessRow from '$lib/components/GuessRow.svelte';
 	import Avatar from '$lib/components/ui/Avatar.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
 	import Pagination from '$lib/components/ui/Pagination.svelte';
@@ -36,8 +35,10 @@
 					top_users: await client.getPublicTopUsers({ page })
 				};
 				currentUsersPage = page;
-			} catch (error) {
-				toast.error('Failed to fetch top users');
+			} catch (e: unknown) {
+				toast.error(
+					`Failed to fetch top users: ${e instanceof Error ? e.message : 'Unknown error'}`
+				);
 			}
 		} else {
 			toast.error('Failed to fetch top users');

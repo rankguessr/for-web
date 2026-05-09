@@ -17,7 +17,7 @@
 
 <div class={['flex w-full flex-col gap-2', className]}>
 	{#if guesses.length > 0}
-		{#each guesses.slice(0, cap) as item}
+		{#each guesses.slice(0, cap) as item (item.id)}
 			<GuessRow guess={item} user={'user' in item ? item.user : undefined} {showTimeSince} />
 		{/each}
 	{:else}

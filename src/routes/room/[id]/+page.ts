@@ -11,11 +11,10 @@ export const load: PageLoad = async ({ params, fetch }) => {
 			room,
 			error: null
 		};
-	} catch (err) {
-		console.error('Error loading room:', err);
+	} catch (err: unknown) {
 		return {
 			room: null,
-			error: 'Failed to load room. Please try again later.'
+			error: err instanceof Error ? err.message : 'An unknown error occurred'
 		};
 	}
 };

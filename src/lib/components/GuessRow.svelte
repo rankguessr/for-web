@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Guess, User } from '$lib/client';
 	import { formatNumber, getCoverURL, timeSince } from '$lib/utils';
-	import { onMount } from 'svelte';
 	import type { UIColors } from './ui';
 	import Avatar from './ui/Avatar.svelte';
 	import Badge from './ui/Badge.svelte';
@@ -47,19 +46,19 @@
 		{#if user}
 			<div class="flex items-center gap-2">
 				<Avatar src={user.avatar_url} alt="User avatar" />
-				<p class="text-right text-sm font-semibold">{user.username}</p>
+				<p class="text-sm font-semibold text-[#cdd6f4]">{user.username}</p>
 			</div>
 		{/if}
 		<div class="flex gap-3">
 			{#if guess.guess !== 0}
 				<div>
 					<p class="text-xs text-gray-400">Guess</p>
-					<p class="font-semibold">#{formatNumber(guess.guess)}</p>
+					<p class="font-semibold text-white">#{formatNumber(guess.guess)}</p>
 				</div>
 			{/if}
 			<div>
 				<p class="text-xs text-success">Actual</p>
-				<p class="font-semibold">#{formatNumber(guess.actual_rank)}</p>
+				<p class="font-semibold text-white">#{formatNumber(guess.actual_rank)}</p>
 			</div>
 		</div>
 	</div>

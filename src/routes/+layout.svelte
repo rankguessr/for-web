@@ -14,13 +14,8 @@
 
 	let { children, data }: LayoutProps = $props();
 
-	const user = $derived(data.user);
-	const userStore = writable(user);
-	setUserContext(userStore);
-
-	$effect(() => {
-		userStore.set(user);
-	});
+	// svelte-ignore state_referenced_locally
+	setUserContext(writable(data.user));
 
 	let loading = $state(false);
 	beforeNavigate(() => {
@@ -55,7 +50,7 @@
 					<Spinner size="xl" />
 				</div>
 			{:else}
-				{#if user}
+				{#if data.user}
 					<UpdateModal />
 				{/if}
 

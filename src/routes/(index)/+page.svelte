@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { client, type RoomKind } from '$lib/client';
-	import { Gamepad2, Trophy, Clock4, FrownIcon } from '@lucide/svelte';
+	import { Gamepad2, Trophy, Clock4 } from '@lucide/svelte';
 	import { env } from '$env/dynamic/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import type { PageProps } from './$types';
@@ -17,6 +17,7 @@
 	import Modal from '$lib/components/ui/Modal.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import Checkbox from '$lib/components/ui/Checkbox.svelte';
+	import { resolve } from '$app/paths';
 
 	const REFILL_INTERVAL = 3 * 60 * 1000;
 	const MAX_REPLAY_SIZE = 10 * 1024 * 1024; // 10mb
@@ -93,8 +94,8 @@
 			validateReplay();
 			submitModal = false;
 			hasReplay = true;
-		} catch (e) {
-			toast.error(e instanceof Error ? e.message : 'Unknown error');
+		} catch (err: unknown) {
+			toast.error('Failed to upload replay', err);
 		}
 	}
 
@@ -112,8 +113,8 @@
 			);
 
 			toast.success('Score submitted successfully');
-		} catch (e) {
-			toast.error(`Failed to submit a score: ${e instanceof Error ? e.message : 'Unknown error'}`);
+		} catch (err: unknown) {
+			toast.error('Failed to submit a score', err);
 		} finally {
 			hasReplay = false;
 			scoreURL = undefined;
@@ -126,9 +127,9 @@
 		try {
 			const { room_id, refill } = await client.createRoom({ kind });
 			if ($user) $user = { ...$user, ...refill };
-			if (room_id && room_id !== '') await goto(`/room/${room_id}`);
-		} catch (e) {
-			toast.error(`Failed to create room: ${e instanceof Error ? e.message : 'Unknown error'}`);
+			if (room_id && room_id !== '') await goto(resolve(`/room/[id]`, { id: room_id }));
+		} catch (err: unknown) {
+			toast.error('Failed to create room', err);
 		} finally {
 			roomLoading = false;
 		}
@@ -140,8 +141,8 @@
 			guessesLoading = true;
 			latest = await client.getGuesses(page);
 			guessesPage = page;
-		} catch (e) {
-			toast.error('Failed to load guesses');
+		} catch (err: unknown) {
+			toast.error('Failed to load guesses', err);
 		} finally {
 			guessesLoading = false;
 		}
@@ -273,7 +274,7 @@
 			</Card>
 
 			{#if room}
-				<a class="row-span-1 max-w-full" href={`/room/${room.id}`}>
+				<a class="row-span-1 max-w-full" href={resolve(`/room/${room.id}`)}>
 					<ScoreCard
 						title="Current Room"
 						score={room.score}

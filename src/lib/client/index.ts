@@ -193,7 +193,7 @@ export class ApiClient {
 		return this._makeRequest(path, { credentials: 'include' });
 	}
 
-	private async _post<T>(path: string, body: any): Promise<T> {
+	private async _post<T>(path: string, body: unknown): Promise<T> {
 		return this._makeRequest(path, {
 			method: 'POST',
 			headers: {

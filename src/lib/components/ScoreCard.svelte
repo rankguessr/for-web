@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Score } from '$lib/client';
-	import { onMount } from 'svelte';
 	import PlayButton from './PlayButton.svelte';
 	import RoomCountdown from './RoomCountdown.svelte';
 	import Badge from './ui/Badge.svelte';
@@ -52,12 +51,12 @@
 			{#if showPlayButton}
 				<PlayButton url={score.beatmapset.preview_url} shouldPlay={shouldPlayPreview} />
 			{/if}
-			<h3 class="text-lg font-semibold">{title}</h3>
+			<h3 class="text-lg font-semibold text-white">{title}</h3>
 			{#if closesAt}
 				<RoomCountdown {closesAt} {onClose} />
 			{/if}
 		</div>
-		<p>
+		<p class="text-white">
 			<span class="font-bold text-green-500">{stats.ok ?? 0}</span> /
 			<span class="font-bold text-yellow-500">{stats.meh ?? 0}</span> /
 			<span class="font-bold text-red-500">{stats.miss ?? 0}</span>
@@ -77,7 +76,7 @@
 			</div>
 			<div class="flex gap-0.5">
 				{#if mods.length > 0}
-					{#each mods as mod}
+					{#each mods as mod (mod)}
 						<Badge color="warning" soft>{mod}</Badge>
 					{/each}
 				{:else}

@@ -16,6 +16,8 @@
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Avatar from '$lib/components/ui/Avatar.svelte';
+	import { resolve } from '$app/paths';
+	import Input from '$lib/components/ui/Input.svelte';
 
 	let { params, data }: PageProps = $props();
 
@@ -38,8 +40,8 @@
 	);
 
 	$effect(() => {
-		if (!user) {
-			goto('/login');
+		if (!$user) {
+			goto(resolve('/'));
 		}
 	});
 
@@ -62,8 +64,8 @@
 			result = { guess: resp.guess, player: resp.player };
 			if ($user) $user = { ...$user, elo: resp.new_elo };
 			invalidate('app:index');
-		} catch (e) {
-			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
+		} catch (err: unknown) {
+			toast.error('Failed to submit guess', err);
 		} finally {
 			submitLoading = false;
 		}
@@ -79,8 +81,8 @@
 			guessInput = 0;
 
 			if ($user) $user = { ...$user, ...next.refill };
-		} catch (e) {
-			toast.error('Failed to submit guess: ' + (e instanceof Error ? e.message : 'Unknown error'));
+		} catch (err: unknown) {
+			toast.error('Failed to get next score', err);
 		} finally {
 			nextLoading = false;
 		}
@@ -95,8 +97,8 @@
 				url.searchParams.set('r', resp.url);
 				window.open(url, '_blank')?.focus();
 			}
-		} catch (e) {
-			toast.error('Failed to open in JoSu: ' + (e instanceof Error ? e.message : 'Unknown error'));
+		} catch (err: unknown) {
+			toast.error('Failed to open in JoSu', err);
 		} finally {
 			josuLoading = false;
 		}
@@ -132,7 +134,7 @@
 					closesAt={room.closes_at}
 					onClose={async () => {
 						if (browser) {
-							await goto('/');
+							await goto(resolve('/'));
 						}
 					}}
 				/>
@@ -188,17 +190,15 @@
 
 				<Card class="min-w-full p-4 py-6">
 					<h2 class="mb-3 text-xl font-semibold">Submit guess</h2>
-					<label for="guess-rank-input" class="mb-2 block text-sm font-medium text-gray-400"
-						>Global rank guess (less than 3mil)</label
-					>
-					<input
+					<Input
+						label=""
 						id="guess-rank-input"
 						type="number"
 						min="1"
 						max="3000000"
 						bind:value={guessInput}
 						placeholder="e.g. 1250"
-						class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+						class="w-full"
 					/>
 
 					<Button

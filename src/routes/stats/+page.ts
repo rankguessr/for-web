@@ -6,11 +6,11 @@ export const load: PageLoad = async ({ fetch }) => {
 
 	try {
 		const stats = await client.getPublicStats();
-		return { stats: stats };
-	} catch (e) {
-		console.log(e);
+		return { stats: stats, error: null };
+	} catch (err: unknown) {
 		return {
-			stats: null
+			stats: null,
+			error: err instanceof Error ? err.message : 'An unknown error occurred'
 		};
 	}
 };

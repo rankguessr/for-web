@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
-	import { getUserContext } from '$lib/context';
 	import { formatNumber } from '$lib/utils';
 	import { LogOut } from '@lucide/svelte';
 	import Avatar from './ui/Avatar.svelte';
-	import Button from './ui/Button.svelte';
+	import { getUserContext } from '$lib/context';
+	import { resolve } from '$app/paths';
+	import ThemeController from './ThemeController.svelte';
 
 	const user = getUserContext();
 </script>
@@ -32,30 +33,36 @@
 				tabindex="-1"
 				class="dropdown-content menu z-1 mt-3 w-52 menu-md rounded-box bg-base-100 p-2 shadow"
 			>
-				<li><a href="/stats">statistics</a></li>
-				<li><a href={env.PUBLIC_DISCORD_URL} target="_blank">discord</a></li>
+				<li><a href={resolve('/stats')}>statistics</a></li>
+				<li><a href={resolve('/discord')} target="_blank">discord</a></li>
+				{#if $user?.is_admin}
+					<li><a href={resolve('/admin')}>admin</a></li>
+				{/if}
 				<li>
 					<button>misc</button>
 					<ul>
-						<li><a href={env.PUBLIC_GITHUB_URL} target="_blank">source code</a></li>
-						<li><a href={env.PUBLIC_DONATION_URL} target="_blank">support me</a></li>
+						<li><a href={resolve('/github')} target="_blank">source code</a></li>
+						<li><a href={resolve('/donate')} target="_blank">support development</a></li>
 					</ul>
 				</li>
 			</ul>
 		</div>
-		<a href="/" class="btn text-xl text-accent btn-ghost">rankguessr</a>
+		<a href={resolve('/')} class="btn text-xl text-accent btn-ghost">rankguessr</a>
 	</div>
 
 	<div class="navbar-center hidden lg:flex">
 		<ul class="menu menu-horizontal px-1">
-			<li><a href="/stats">statistics</a></li>
-			<li><a href={env.PUBLIC_DISCORD_URL} target="_blank">discord</a></li>
+			<li><a href={resolve('/stats')}>statistics</a></li>
+			<li><a href={resolve('/discord')} target="_blank">discord</a></li>
+			{#if $user?.is_admin}
+				<li><a href={resolve('/admin')}>admin</a></li>
+			{/if}
 			<li>
 				<details>
 					<summary>misc</summary>
 					<ul class="z-1 w-40 bg-base-100 p-2">
-						<li><a href={env.PUBLIC_DONATION_URL} target="_blank">support me</a></li>
-						<li><a href={env.PUBLIC_GITHUB_URL} target="_blank">github</a></li>
+						<li><a href={resolve('/donate')} target="_blank">support development</a></li>
+						<li><a href={resolve('/github')} target="_blank">source code</a></li>
 					</ul>
 				</details>
 			</li>
@@ -69,9 +76,12 @@
 					<p class="text-xs font-semibold">({formatNumber($user.elo)} elo)</p>
 				</div>
 				<Avatar src={$user.avatar_url} alt={$user.username} />
-				<a href={`${env.PUBLIC_API_URL}/auth/logout`}>
+
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<!-- <a href={`${env.PUBLIC_API_URL}/auth/logout`}>
 					<LogOut size={20} />
-				</a>
+				</a> -->
+				<ThemeController />
 			{/if}
 		</div>
 	</div>

@@ -6,7 +6,7 @@
 	import { env } from '$env/dynamic/public';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import { getUserContext } from '$lib/context';
-	import { CircleAlert } from '@lucide/svelte';
+	import { CircleAlert, InfoIcon } from '@lucide/svelte';
 	import { Turnstile } from 'svelte-turnstile';
 	import { toast } from '$lib/toasts';
 	import RoomCountdown from '$lib/components/RoomCountdown.svelte';
@@ -154,7 +154,7 @@
 			{/if}
 
 			{#if !result && !room.guess}
-				<Card class="min-w-full p-4 py-6">
+				<Card class="min-w-full p-4 pt-6 pb-4">
 					<h2 class="mb-3 text-xl font-semibold">Download replay</h2>
 					<p class="mb-4 text-gray-400">
 						Download anonymized replay then estimate player's global rank
@@ -186,6 +186,19 @@
 							</Button>
 						</div>
 					</div>
+
+					{#if josuAvailable}
+						<p class="flex gap-1 pt-5 text-sm text-gray-300">
+							<InfoIcon class="inline" size={18} />
+							<span>
+								We are using
+								<a href="https://github.com/FukutoTojido/beatmap-viewer-web" class="link">JoSu!</a>
+								by
+								<a href="https://x.com/FukutoTojido" class="link">FukutoTojido</a> to render replays in
+								browser. You should check them out!
+							</span>
+						</p>
+					{/if}
 				</Card>
 
 				<Card class="min-w-full p-4 py-6">

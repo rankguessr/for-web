@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { env } from '$env/dynamic/public';
 	import { formatNumber } from '$lib/utils';
-	import { LogOut } from '@lucide/svelte';
 	import Avatar from './ui/Avatar.svelte';
 	import { getUserContext } from '$lib/context';
 	import { resolve } from '$app/paths';
@@ -45,6 +44,8 @@
 						<li><a href={resolve('/donate')} target="_blank">support development</a></li>
 					</ul>
 				</li>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<li><a href={`${env.PUBLIC_API_URL}/auth/logout`}>logout</a></li>
 			</ul>
 		</div>
 		<a href={resolve('/')} class="btn text-xl text-accent btn-ghost">rankguessr</a>
@@ -75,12 +76,17 @@
 					<p class="text-xs font-medium sm:text-sm">{$user.username}</p>
 					<p class="text-xs font-semibold">({formatNumber($user.elo)} elo)</p>
 				</div>
-				<Avatar src={$user.avatar_url} alt={$user.username} />
+				<div class="dropdown dropdown-end">
+					<Avatar src={$user.avatar_url} alt={$user.username} asButton />
+					<ul
+						tabindex="-1"
+						class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-100 p-2 shadow"
+					>
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+						<li><a href={`${env.PUBLIC_API_URL}/auth/logout`}>Logout</a></li>
+					</ul>
+				</div>
 
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<!-- <a href={`${env.PUBLIC_API_URL}/auth/logout`}>
-					<LogOut size={20} />
-				</a> -->
 				<ThemeController />
 			{/if}
 		</div>

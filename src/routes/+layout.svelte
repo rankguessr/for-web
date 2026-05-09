@@ -46,7 +46,7 @@
 	{/if}
 </svelte:head>
 
-<main class="flex min-h-screen w-full flex-col bg-base-100">
+<main class="flex min-h-screen w-full flex-col bg-base-100 font-rubik">
 	<div class="mx-auto flex min-h-screen w-full flex-col">
 		<Navbar />
 		<div class="flex w-full flex-1 flex-col px-4">

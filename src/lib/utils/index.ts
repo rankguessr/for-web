@@ -1,7 +1,7 @@
 const numFormat = new Intl.NumberFormat();
 
 export const getCoverURL = (beatmapset_id: number, beatmap_id: number): string => {
-	return `https://assets.ppy.sh/beatmaps/${beatmapset_id}/covers/slimcover.jpg?${beatmap_id}`;
+	return `https://assets.ppy.sh/beatmaps/${beatmapset_id}/covers/card@2x.jpg?${beatmap_id}`;
 };
 
 export const validateScoreURL = (url: string): boolean => {

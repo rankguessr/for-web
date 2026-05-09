@@ -121,7 +121,7 @@
 	{:else if nextLoading}
 		<Spinner size="lg" />
 	{:else}
-		<div class="flex w-full flex-col items-center gap-3 md:w-3xl">
+		<div class="flex w-full flex-col items-center gap-3 md:w-175">
 			<div class="flex w-full justify-between">
 				<div class="flex items-center gap-1">
 					<Badge color="warning" soft>{room.kind === 'v2' ? 'Ranked' : 'Unranked'}</Badge>
@@ -138,7 +138,7 @@
 				/>
 			</div>
 
-			<div class="w-full">
+			<div class="h-34 w-full">
 				<ScoreCard score={room.score} shouldPlayPreview={false} />
 			</div>
 
@@ -158,37 +158,31 @@
 						Download anonymized replay then estimate player's global rank
 					</p>
 
-					<div class="grid grid-cols-3 grid-rows-1 gap-2">
+					<div class="flex w-full flex-1 flex-col gap-2">
 						{#if josuAvailable}
-							<Button
-								target="_blank"
-								color="accent"
-								disabled={josuLoading}
-								class="col-span-2 row-end-1"
-								onclick={openInJosu}
-							>
+							<Button target="_blank" color="accent" disabled={josuLoading} onclick={openInJosu}>
 								{josuLoading ? 'Downloading replay...' : 'Watch using JoSu'}
 							</Button>
 						{/if}
-						<Button
-							href={`${env.PUBLIC_API_URL}/room/replay/${params.id}.osr`}
-							download
-							disabled={josuLoading}
-							target="_blank"
-							color={josuAvailable ? 'secondary' : 'accent'}
-							class="col-span-1 row-end-1"
-						>
-							Download replay
-						</Button>
-						<Button
-							href={`https://osu.ppy.sh/beatmapsets/${room.score.beatmap.beatmapset_id}`}
-							target="_blank"
-							color="secondary"
-							disabled={josuLoading}
-							class="col-span-1 row-end-1"
-						>
-							Download beatmap
-						</Button>
+						<div class="grid grid-cols-2 gap-1">
+							<Button
+								href={`${env.PUBLIC_API_URL}/room/replay/${params.id}.osr`}
+								download
+								disabled={josuLoading}
+								target="_blank"
+								color={josuAvailable ? 'secondary' : 'accent'}
+							>
+								Download replay
+							</Button>
+							<Button
+								href={`https://osu.ppy.sh/beatmapsets/${room.score.beatmap.beatmapset_id}`}
+								target="_blank"
+								color="secondary"
+								disabled={josuLoading}
+							>
+								Download beatmap
+							</Button>
+						</div>
 					</div>
 				</Card>
 
@@ -221,6 +215,7 @@
 						theme="dark"
 						class="mt-4 w-full"
 						size="flexible"
+						appearance="interaction-only"
 						on:callback={(event) => (turnstileToken = event.detail.token)}
 						on:error={(event) => {
 							toast.error('Turnstile error: ' + event.detail.code);

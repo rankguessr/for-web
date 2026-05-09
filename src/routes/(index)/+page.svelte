@@ -19,7 +19,7 @@
 	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
 	const REFILL_INTERVAL = 3 * 60 * 1000;
-	const MAX_REPLAY_SIZE = 5 * 1024 * 1024; // 5mb
+	const MAX_REPLAY_SIZE = 10 * 1024 * 1024; // 10mb
 
 	const { data }: PageProps = $props();
 
@@ -63,26 +63,26 @@
 		if (intervalId) clearInterval(intervalId);
 	});
 
-	let replayURL = $state<string | null>(null);
-	let replayFile = $state<File | null>(null);
+	let scoreURL = $state<string>();
+	let scoreFile = $state<FileList>();
 	let hasReplay = $state(false);
 
 	function validateReplay() {
-		if (!replayURL && !replayFile) {
+		if (!scoreURL && !scoreFile) {
 			throw new Error('Please provide a score URL or a replay file');
 		}
 
-		if (replayURL && replayFile) {
+		if (scoreURL && scoreFile) {
 			throw new Error('Please provide only one of score URL or replay file');
 		}
 
-		if (replayURL) {
-			const valid = validateScoreURL(replayURL);
+		if (scoreURL) {
+			const valid = validateScoreURL(scoreURL);
 			if (!valid) {
 				throw new Error('Invalid score URL');
 			}
-		} else if (replayFile) {
-			if (replayFile.size > MAX_REPLAY_SIZE) {
+		} else if (scoreFile) {
+			if (scoreFile[0].size > MAX_REPLAY_SIZE) {
 				throw new Error('Replay file is too large');
 			}
 		}
@@ -99,21 +99,25 @@
 	}
 
 	async function onSubmitAction(e: SubmitEvent) {
+		e.preventDefault();
 		const data = new FormData(e.target as HTMLFormElement);
-		const score_url = data.get('score_url') as string;
-		const comment = data.get('comment') as string;
-
-		if (!score_url) {
-			toast.error('Score URL is required');
-			return;
-		}
+		const comment = (data.get('comment') ?? '') as string;
+		const is_anonymous = data.get('is_anonymous') === 'on';
 
 		try {
-			await client.submitScore({ score_url, comment });
+			await client.submitScore(
+				scoreFile && scoreFile.length > 0
+					? { score_file: scoreFile[0], comment, is_anonymous }
+					: { score_url: scoreURL!, comment, is_anonymous }
+			);
 
 			toast.success('Score submitted successfully');
 		} catch (e) {
 			toast.error(`Failed to submit a score: ${e instanceof Error ? e.message : 'Unknown error'}`);
+		} finally {
+			hasReplay = false;
+			scoreURL = undefined;
+			scoreFile = undefined;
 		}
 	}
 
@@ -148,15 +152,6 @@
 	<title>rankguessr - Guess osu! global rank from replay</title>
 </svelte:head>
 
-{#snippet loginBtn()}
-	<Button class="gap-2" color="primary" size="lg" href={`${env.PUBLIC_API_URL}/auth/login`}>
-		<div class="h-6 w-6">
-			<OsuIcon />
-		</div>
-		Login with osu
-	</Button>
-{/snippet}
-
 <Modal id="upload-replay-modal" bind:showModal={submitModal}>
 	<h3 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Replay info</h3>
 	<div class="flex w-full flex-col gap-4">
@@ -165,17 +160,19 @@
 				class="w-full"
 				type="url"
 				label="Score URL"
+				name="score_url"
 				placeholder="https://osu.ppy.sh/scores/..."
-				disabled={!!replayFile}
-				bind:value={replayURL}
+				disabled={!!scoreFile}
+				bind:value={scoreURL}
 				required
 			/>
 			<div class="divider">or</div>
 			<input
 				type="file"
+				name="score_file"
 				class="file-input w-full file-input-secondary"
-				bind:value={replayFile}
-				disabled={!!replayURL}
+				bind:files={scoreFile}
+				disabled={!!scoreURL}
 			/>
 		</div>
 
@@ -187,29 +184,64 @@
 	<h3 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Submit a score</h3>
 	<form class="flex w-full flex-col gap-4" onsubmit={onSubmitAction}>
 		<div class="mb-2 flex w-full flex-col gap-2">
-			<Input class="w-full" type="text" label="Comment" placeholder="Add a comment..." />
-			<Checkbox label="Submit anonymously" color="warning" checked={false} />
+			<Input
+				class="w-full"
+				type="text"
+				label="Comment"
+				name="comment"
+				placeholder="Add a comment..."
+			/>
+			<Checkbox label="Submit anonymously" name="is_anonymous" color="warning" checked={false} />
 		</div>
 
 		<Button type="submit" color="accent">Submit</Button>
 	</form>
 </Modal>
 
-<section class="flex max-w-full flex-1 flex-col justify-center gap-4 py-4 md:flex-row">
-	<div
-		class={` grid grid-cols-1 gap-4 ${$user ? 'grid-rows-4' : 'grid-rows-5'} ${latest && latest.items.length > 0 ? 'md:w-xl' : 'md:w-3xl'}`}
+{#if !$user}
+	<section
+		class="flex max-w-full flex-1 flex-col items-center justify-center gap-4 py-4 md:flex-row"
 	>
-		<Card
-			class={`row-span-3 flex max-w-full flex-col items-center justify-center gap-5 px-5 py-10 ${$user ? '' : 'row-end-5'}`}
-		>
-			<div class="w-full space-y-2">
-				<h1 class="text-4xl font-bold">Guess osu! global rank from replay</h1>
+		<Card class="flex max-w-150 flex-col items-center justify-center gap-6 px-8 py-22">
+			<div class="w-full space-y-4">
+				<h1 class="text-4xl font-semibold">Guess osu! global rank from replay</h1>
 				<p class="text-gray-500 dark:text-gray-400">
 					Download random player's one of top 20 replays, watch it and try to get an exact guess!
 				</p>
 			</div>
 
-			{#if $user}
+			<div class="flex w-full flex-wrap items-center gap-3">
+				<Button class="gap-2" color="accent" size="lg" href={`${env.PUBLIC_API_URL}/auth/login`}>
+					<div class="h-6 w-6">
+						<OsuIcon />
+					</div>
+					Login with osu
+				</Button>
+				<Button color="secondary" href="/stats">
+					<Trophy class="mr-2 h-4 w-4" />
+					Statistics
+				</Button>
+			</div>
+		</Card>
+	</section>
+{:else}
+	<section class="flex max-w-full flex-1 flex-col justify-center gap-4 py-4 md:flex-row">
+		<div
+			class={[
+				'grid grid-cols-1 grid-rows-4 gap-4',
+				latest && latest.items.length > 0 ? 'md:w-xl' : 'md:w-3xl'
+			]}
+		>
+			<Card
+				class="row-span-3 flex max-w-full flex-col items-center justify-center gap-5 px-5 py-10"
+			>
+				<div class="w-full space-y-2">
+					<h1 class="text-4xl font-bold">Guess osu! global rank from replay</h1>
+					<p class="text-gray-500 dark:text-gray-400">
+						Download random player's one of top 20 replays, watch it and try to get an exact guess!
+					</p>
+				</div>
+
 				<div class="flex w-full flex-col gap-2">
 					<div class="flex w-full flex-wrap items-center gap-3">
 						<Button
@@ -238,70 +270,63 @@
 						</p>
 					{/if}
 				</div>
-			{:else}
-				<div class="flex w-full flex-wrap items-center gap-3">
-					{@render loginBtn()}
-					<Button>
-						<Trophy class="mr-2 h-4 w-4" />
-						Statistics
-					</Button>
-				</div>
-			{/if}
-		</Card>
+			</Card>
 
-		{#if room}
-			<a class="row-span-1 max-w-full" href={`/room/${room.id}`}>
-				<ScoreCard
-					title="Current Room"
-					score={room.score}
-					showPlayButton={false}
-					closesAt={room.closes_at}
-					onClose={() => (room = null)}
-				/>
-			</a>
-		{:else if $user}
-			<Card class="row-span-1 flex min-w-full flex-col justify-between gap-2 p-4">
-				<div class="flex items-center justify-start gap-1.5 text-xl font-semibold">
-					Submit your score
+			{#if room}
+				<a class="row-span-1 max-w-full" href={`/room/${room.id}`}>
+					<ScoreCard
+						title="Current Room"
+						score={room.score}
+						showPlayButton={false}
+						closesAt={room.closes_at}
+						onClose={() => (room = null)}
+					/>
+				</a>
+			{:else}
+				<Card class="row-span-1 flex min-w-full flex-col justify-between gap-2 p-4">
+					<div class="flex items-center justify-start gap-1.5 text-xl font-semibold">
+						Submit your score
+					</div>
+					<p class="text-wrap text-gray-500 dark:text-gray-400">
+						You can submit your most (or least) proud score for others to guess!
+					</p>
+					<Button color="secondary" onclick={() => (submitModal = true)}>Submit a score</Button>
+				</Card>
+			{/if}
+		</div>
+
+		{#if latest && latest.items.length > 0}
+			<Card class="flex flex-col items-center justify-between gap-3 p-4 md:w-xl">
+				<div class="flex w-full items-center justify-start gap-2">
+					<Clock4 class="h-5 w-5" />
+					<h2 class="text-xl font-semibold">Last guesses</h2>
 				</div>
-				<p class="text-wrap text-gray-500 dark:text-gray-400">
-					You can submit your most (or least) proud score for others to guess!
-				</p>
-				<Button color="secondary" onclick={() => (submitModal = true)}>Submit a score</Button>
+
+				{#if guessesLoading}
+					<div class="flex w-full flex-1 flex-col gap-2">
+						{#each Array.from({ length: 6 }, (_, idx) => idx) as idx (idx)}
+							<div class="h-22 w-full skeleton"></div>
+						{/each}
+					</div>
+				{:else}
+					<GuessesColumn
+						class="md:min-h-142"
+						guesses={latest?.items ?? []}
+						cap={6}
+						showTimeSince={true}
+					/>
+				{/if}
+
+				{#if latest.pages_total > 1}
+					<Pagination
+						{onPageChange}
+						currentPage={guessesPage}
+						totalPages={latest?.pages_total ?? 5}
+						visiblePages={6}
+						size="md"
+					/>
+				{/if}
 			</Card>
 		{/if}
-	</div>
-
-	{#if $user && latest && latest.items.length > 0}
-		<Card class="flex flex-col items-center justify-between gap-3 p-4 md:w-xl">
-			<div class="flex w-full items-center justify-start gap-2">
-				<Clock4 class="h-5 w-5" />
-				<h2 class="text-xl font-semibold">Last guesses</h2>
-			</div>
-
-			{#if guessesLoading}
-				<div class="flex w-full flex-1 flex-col gap-2">
-					{#each Array.from({ length: 6 }, (_, idx) => idx) as idx (idx)}
-						<div class="h-22 w-full skeleton"></div>
-					{/each}
-				</div>
-			{:else}
-				<GuessesColumn
-					class="md:min-h-142"
-					guesses={latest?.items ?? []}
-					cap={6}
-					showTimeSince={true}
-				/>
-			{/if}
-			{#if latest && latest.pages_total > 1}
-				<Pagination
-					{onPageChange}
-					currentPage={guessesPage}
-					totalPages={latest?.pages_total ?? 5}
-					visiblePages={6}
-					size="md"
-				/>
-			{/if}
-		</Card>
-	{/if}
-</section>
+	</section>
+{/if}

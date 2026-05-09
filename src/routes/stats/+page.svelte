@@ -1,13 +1,18 @@
 <script lang="ts">
+	import { client } from '$lib/client';
 	import GuessesColumn from '$lib/components/GuessesColumn.svelte';
 	import GuessRow from '$lib/components/GuessRow.svelte';
 	import Avatar from '$lib/components/ui/Avatar.svelte';
 	import Card from '$lib/components/ui/Card.svelte';
+	import Pagination from '$lib/components/ui/Pagination.svelte';
+	import { toast } from '$lib/toasts';
 	import { formatNumber } from '$lib/utils';
 	import { TrophyIcon } from '@lucide/svelte';
 
 	const { data } = $props();
-	const stats = $derived(data.stats);
+
+	let stats = $derived(data.stats);
+	let currentUsersPage = $state(1);
 
 	function getRankColor(rank: number) {
 		switch (rank) {
@@ -21,6 +26,23 @@
 				return '';
 		}
 	}
+
+	async function onUsersPageChange(page: number) {
+		if (page === currentUsersPage) return;
+		if (stats) {
+			try {
+				stats = {
+					...stats,
+					top_users: await client.getPublicTopUsers({ page })
+				};
+				currentUsersPage = page;
+			} catch (error) {
+				toast.error('Failed to fetch top users');
+			}
+		} else {
+			toast.error('Failed to fetch top users');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -28,11 +50,9 @@
 </svelte:head>
 
 {#if stats}
-	{@const { best, top_users } = stats}
-
 	<section class="flex max-w-full flex-1 justify-center py-4">
 		<div class="flex w-2xl flex-col gap-4 sm:flex-row sm:justify-center md:w-5xl">
-			<Card class="flex w-full flex-col gap-3 p-3 py-4">
+			<Card class="flex w-full flex-col items-center gap-3 p-3 py-5">
 				<div class="flex w-full items-center gap-2">
 					<TrophyIcon class="h-5 w-5" />
 					<h2 class="text-2xl font-semibold">Best guessers</h2>
@@ -41,7 +61,7 @@
 				<div
 					class="flex h-full w-full flex-col gap-3 py-4 md:items-center md:justify-between md:gap-0"
 				>
-					{#each top_users as user (user.osu_id)}
+					{#each stats.top_users.items as user (user.osu_id)}
 						<a
 							href={`https://osu.ppy.sh/users/${user.osu_id}`}
 							class="flex w-full items-center justify-between"
@@ -64,30 +84,41 @@
 								</div>
 							</div>
 
-							<p class="font-semibold">{formatNumber(user.elo)} elo</p>
+							<p class="inline font-semibold">
+								{formatNumber(user.elo)}
+								<span class="hidden min-[420px]:inline sm:max-[700px]:hidden">elo</span>
+							</p>
 						</a>
 					{/each}
 				</div>
+				{#if stats.top_users.pages_total > 1}
+					<Pagination
+						onPageChange={onUsersPageChange}
+						totalPages={stats.top_users.pages_total}
+						currentPage={currentUsersPage}
+						visiblePages={6}
+					/>
+				{/if}
 			</Card>
 
 			<div class="flex w-full flex-col gap-4 sm:w-full md:w-full">
 				<div class="flex gap-2">
-					<Card class="w-full p-2">
+					<Card class="w-full p-4">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses today</p>
 						<div class="mt-2 text-4xl font-bold">{formatNumber(stats.count_24h)}</div>
 					</Card>
-					<Card class="w-full p-2">
+					<Card class="w-full p-4">
 						<p class="text-sm text-gray-500 dark:text-gray-400">Guesses total</p>
 						<div class="mt-2 text-4xl font-bold">{formatNumber(stats.count_global)}</div>
 					</Card>
 				</div>
 
-				<Card class="h-full p-3">
+				<Card class="flex flex-1 flex-col p-3">
 					<div class="mb-4 items-center gap-2">
 						<h2 class="text-xl font-semibold">Best guesses (24h)</h2>
 					</div>
 
-					<GuessesColumn guesses={best} cap={5} showTimeSince={true} />
+					<GuessesColumn guesses={stats.best} cap={5} showTimeSince={true} />
 				</Card>
 			</div>
 		</div>

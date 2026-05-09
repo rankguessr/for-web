@@ -72,10 +72,6 @@
 				<a href={`${env.PUBLIC_API_URL}/auth/logout`}>
 					<LogOut size={20} />
 				</a>
-			{:else}
-				<Button href={`${env.PUBLIC_API_URL}/auth/login`} size="sm" color="primary"
-					>Login with osu!</Button
-				>
 			{/if}
 		</div>
 	</div>

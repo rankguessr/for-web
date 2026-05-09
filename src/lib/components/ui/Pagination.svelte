@@ -2,7 +2,7 @@
 	import type { PaginationProps } from '.';
 
 	let {
-		currentPage,
+		currentPage = $bindable(),
 		totalPages,
 		visiblePages = 5,
 		size = 'md',
@@ -17,26 +17,29 @@
 
 	const pageNumbers = $derived(paginationRange(firstPage, lastPage));
 
-	function sizeToClass(size: string) {
-		switch (size) {
-			case 'sm':
-				return 'btn-sm';
-			case 'lg':
-				return 'btn-lg';
-			default:
-				return '';
-		}
-	}
-
 	function paginationRange(start: number, end: number): number[] {
 		return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 	}
 </script>
 
-{#snippet quickBtn(text: string, disabled: boolean, onclick: () => void)}
+{#snippet pageButton({
+	text,
+	onclick,
+	disabled = false,
+	active = false
+}: {
+	text: string;
+	disabled?: boolean;
+	active?: boolean;
+	onclick: VoidFunction;
+})}
 	<button
 		type="button"
-		class={['btn join-item btn-secondary', disabled ? 'btn-disabled' : '', sizeToClass(size)]}
+		class={[
+			'btn join-item btn-md btn-secondary max-[480px]:btn-sm',
+			disabled ? 'btn-disabled' : '',
+			active ? 'btn-active' : ''
+		]}
 		{onclick}
 	>
 		{text}
@@ -44,15 +47,21 @@
 {/snippet}
 
 <div class="join">
-	{@render quickBtn('«', currentPage <= 1, () => onPageChange(currentPage - 1))}
+	{@render pageButton({
+		text: '«',
+		disabled: currentPage <= 1,
+		onclick: () => onPageChange(currentPage - 1)
+	})}
 	{#each pageNumbers as page}
-		<button
-			class={['btn join-item btn-secondary', sizeToClass(size)]}
-			class:btn-active={page === currentPage}
-			onclick={() => onPageChange(page)}
-		>
-			{page}
-		</button>
+		{@render pageButton({
+			text: page.toString(),
+			active: page === currentPage,
+			onclick: () => onPageChange(page)
+		})}
 	{/each}
-	{@render quickBtn('»', currentPage >= totalPages, () => onPageChange(currentPage + 1))}
+	{@render pageButton({
+		text: '»',
+		disabled: currentPage >= totalPages,
+		onclick: () => onPageChange(currentPage + 1)
+	})}
 </div>

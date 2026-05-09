@@ -4,7 +4,7 @@ import { analyzer } from 'vite-bundle-analyzer';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit(), analyzer()],
+	plugins: [tailwindcss(), sveltekit(), analyzer({ openAnalyzer: false })],
 	server: {
 		proxy: {
 			'/api': {

@@ -192,10 +192,14 @@
 							<InfoIcon class="inline" size={18} />
 							<span>
 								We are using
-								<a href="https://github.com/FukutoTojido/beatmap-viewer-web" class="link">JoSu!</a>
+								<a
+									href="https://github.com/FukutoTojido/beatmap-viewer-web"
+									class="link"
+									target="_blank">JoSu!</a
+								>
 								by
-								<a href="https://x.com/FukutoTojido" class="link">FukutoTojido</a> to render replays in
-								browser. You should check them out!
+								<a href="https://x.com/FukutoTojido" class="link" target="_blank">FukutoTojido</a> to
+								render replays in browser. You should check them out!
 							</span>
 						</p>
 					{/if}
